@@ -1,0 +1,7 @@
+{% extends "layout/public.html" %}
+{% comment %}PRIVATE layout for signed-in people: the public header and footer, plus the account sidebar with the user's name
+(settings.LAYOUT["USER_NAV"]). Views using it must be @private (layout/access.py). As a safety net the page content is
+only drawn for signed-in people; others see a "please sign in" notice.{% endcomment %}
+{% block layout_class %}layout-user{% endblock %}
+{% block sidebar %}{% if user.is_authenticated %}{% include "layout/partials/sidebar.html" with items=layout.user_nav title="Your account" show_user=True %}{% endif %}{% endblock %}
+{% block main %}{% if user.is_authenticated %}{{ block.super }}{% else %}{% include "layout/partials/private_notice.html" with need="private" %}{% endif %}{% endblock %}

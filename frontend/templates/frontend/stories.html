@@ -1,0 +1,29 @@
+{% extends "layout/pages/listing.html" %}
+{% load static %}
+{% comment %}
+  The stories list. The band, header, footer and page links come from the layout (layout/pages/listing.html).
+  The toolbar and the cards are this page's own HTML.
+{% endcomment %}
+{% block title %}Stories{% endblock %}
+{% block heading %}Stories{% endblock %}
+{% block band_text %}Short notes about this site.{% endblock %}
+{% block toolbar %}<span>{{ page_obj.paginator.count }} stories</span>{% endblock %}
+
+{% block items %}
+  {% for story in page_obj %}
+    <article class="card">
+      <img class="card__image" src="{% static story.image %}" alt="" loading="lazy" width="640" height="400">
+      <div class="card__body">
+        <p class="card__meta">{{ story.date }}</p>
+        <h3 class="card__title">{{ story.title }}</h3>
+        <p>{{ story.summary }}</p>
+        <a class="card__link" href="{% url 'frontend:story' story.slug %}">Read &rarr;</a>
+      </div>
+    </article>
+  {% empty %}
+    <div class="empty-state">
+      {% include "layout/partials/icon.html" with name="info" %}
+      <p class="empty-state__title">No stories yet</p>
+    </div>
+  {% endfor %}
+{% endblock %}

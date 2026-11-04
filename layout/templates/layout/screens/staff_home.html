@@ -1,0 +1,13 @@
+{% extends "layout/admin.html" %}
+{% comment %}The staff area's start page (layout/views.py → staff_home), an example of the admin layout.{% endcomment %}
+{% block title %}Staff dashboard{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+<div class="stats">{% for label, value in stats %}<div class="stat"><strong>{{ value }}</strong><span>{{ label }}</span></div>{% endfor %}</div>
+{% if recent %}
+<h2>Newest people</h2>
+<div class="table-wrap"><table class="table"><thead><tr><th scope="col">Username</th><th scope="col">Joined</th><th scope="col">Staff</th></tr></thead>
+<tbody>{% for u in recent %}<tr><td>{{ u.get_username }}</td><td>{{ u.date_joined|date:"j M Y" }}</td><td>{% if u.is_staff %}Yes{% else %}No{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% endif %}
+<div class="panel"><h2>Add your own staff pages</h2><p>Create an app, use <code>@staff_only</code> on its views and <code>{% verbatim %}{% extends "layout/admin.html" %}{% endverbatim %}</code> in its templates, then add the links to <code>LAYOUT["ADMIN_NAV"]</code>.</p></div>
+{% endblock %}

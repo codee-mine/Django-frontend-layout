@@ -1,0 +1,19 @@
+{% extends "layout/base.html" %}
+{% comment %}STAFF layout: admin header, dark admin sidebar (settings.LAYOUT["ADMIN_NAV"]), a small footer.
+Views using it must be @staff_only (layout/access.py). As a safety net the page content and menu are only drawn for
+active staff; others see a "not allowed" notice.{% endcomment %}
+{% block layout_class %}layout-admin{% endblock %}
+{% block nav_mode %}static{% endblock %}
+{% block header %}
+<header class="site-header admin-header">
+  <a class="brand" href="{{ layout.admin_home_url|default:'/' }}">{% include "layout/partials/logo.html" %}<span>{{ layout.site_name }} <small>staff</small></span></a>
+  <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="admin-menu" data-menu-toggle>{% include "layout/partials/icon.html" with name="menu" %}<span class="visually-hidden">Menu</span></button>
+  <div class="site-header__menu" id="admin-menu">
+    <nav class="navbar" aria-label="Website"><ul><li><a href="{{ layout.home_url|default:'/' }}">View website</a></li></ul></nav>
+    {% include "layout/partials/profile_menu.html" %}
+  </div>
+</header>
+{% endblock %}
+{% block sidebar %}{% if user.is_active and user.is_staff %}{% include "layout/partials/sidebar.html" with items=layout.admin_nav title="Staff area" %}{% endif %}{% endblock %}
+{% block main %}{% if user.is_active and user.is_staff %}{{ block.super }}{% else %}{% include "layout/partials/private_notice.html" with need="staff" %}{% endif %}{% endblock %}
+{% block footer %}<footer class="admin-footer">{{ layout.site_name }} · staff area</footer>{% endblock %}

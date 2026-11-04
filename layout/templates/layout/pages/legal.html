@@ -1,0 +1,10 @@
+{% extends "layout/pages/band.html" %}
+{% comment %}Legal layout (privacy, terms): the band, a contents list that stays in view, the text.
+Fill: title, heading, band_text (e.g. "Last updated …"), toc (<li><a href="#part">Part</a></li> items),
+legal_text (<h2 id="part">Part</h2><p>…</p> …).{% endcomment %}
+{% block content %}
+<div class="legal-grid">
+  <nav class="toc" aria-label="On this page"><p class="label">On this page</p><ol>{% block toc %}{% endblock %}</ol></nav>
+  <div class="prose">{% block legal_text %}{% endblock %}</div>
+</div>
+{% endblock %}

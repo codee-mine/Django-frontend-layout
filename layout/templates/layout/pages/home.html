@@ -1,0 +1,19 @@
+{% extends "layout/public.html" %}
+{% load static %}
+{% comment %}Home page layout: a full-screen picture with a big title; the header is see-through until you scroll.
+Fill: title, eyebrow, hero_title, hero_text, hero_actions, content.  Optional: hero_image (a picture's URL).{% endcomment %}
+{% block nav_mode %}transparent{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+{% block page_header %}{% endblock %}
+{% block hero %}
+<section class="hero">
+  <img class="hero__bg" src="{% block hero_image %}{% static 'layout/img/scene-1.svg' %}{% endblock %}" alt="" width="1600" height="900">
+  <span class="hero__shade"></span>
+  <div class="hero__inner">
+    <p class="eyebrow">{% block eyebrow %}{% endblock %}</p>
+    <h1 class="hero__title">{% block hero_title %}{{ layout.site_name }}{% endblock %}</h1>
+    <p class="hero__text">{% block hero_text %}{{ layout.description }}{% endblock %}</p>
+    <div class="hero__actions">{% block hero_actions %}{% endblock %}</div>
+  </div>
+</section>
+{% endblock %}

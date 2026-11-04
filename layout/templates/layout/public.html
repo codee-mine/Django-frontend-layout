@@ -1,0 +1,36 @@
+{% extends "layout/base.html" %}
+{% comment %}
+  PUBLIC layout (no sign-in needed): the site header with the main menu, and the footer.
+  Pages fill: title, heading, content (or use a page layout from layout/pages/ built on this one).
+  Menus come from settings.LAYOUT["PUBLIC_NAV"] and ["FOOTER_NAV"].
+{% endcomment %}
+{% block layout_class %}layout-public{% endblock %}
+
+{% block header %}
+<header class="site-header">
+  <a class="brand" href="{{ layout.home_url|default:'/' }}">{% include "layout/partials/logo.html" %}<span>{{ layout.site_name }}</span></a>
+  <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-nav" data-menu-toggle>{% include "layout/partials/icon.html" with name="menu" %}<span class="visually-hidden">Menu</span></button>
+  <div class="site-header__menu" id="site-nav">
+    {% include "layout/partials/navbar.html" with items=layout.public_nav %}
+    {% include "layout/partials/profile_menu.html" %}
+  </div>
+</header>
+{% endblock %}
+
+{% block footer %}
+<footer class="site-footer">
+  <div class="site-footer__grid">
+    <div class="site-footer__about">
+      <a class="brand" href="{{ layout.home_url|default:'/' }}">{% include "layout/partials/logo.html" %}<span>{{ layout.site_name }}</span></a>
+      <p>{{ layout.description }}</p>
+    </div>
+    <div><h2>Explore</h2>{% include "layout/partials/navbar.html" with items=layout.public_nav label="Explore" %}</div>
+    {% if layout.footer_nav %}<div><h2>Information</h2>{% include "layout/partials/navbar.html" with items=layout.footer_nav label="Information" %}</div>{% endif %}
+  </div>
+  <div class="site-footer__bottom"><p>&copy; {% now "Y" %} {{ layout.site_name }}. All rights reserved.</p></div>
+</footer>
+{% endblock %}
+
+{% comment %}The header has "Sign in", so public pages carry the account modal (signed-out visitors only).
+A page that doesn't want it empties the modals block.{% endcomment %}
+{% block modals %}{% if layout.account_modal %}{% include "layout/partials/auth_modal.html" with login_action=layout.login_url signup_action=layout.signup_url reset_url=layout.password_reset_url modal_id="auth-modal" %}{% endif %}{% endblock %}

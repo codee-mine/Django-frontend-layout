@@ -1,0 +1,23 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% comment %}Sign-in, sign-up and password pages: a picture with a quote on the left (wide screens), the form on the right.
+No menus, no breadcrumbs. A page may change the picture or quote with the auth_image / auth_quote / auth_quote_by blocks.{% endcomment %}
+{% block layout_class %}layout-auth{% endblock %}
+{% block nav_mode %}static{% endblock %}
+{% block header %}
+<aside class="auth-art" aria-hidden="true">
+  <img class="auth-art__bg" src="{% block auth_image %}{% static 'layout/img/scene-4.svg' %}{% endblock %}" alt="">
+  <span class="auth-art__shade"></span>
+  <span class="brand">{% include "layout/partials/logo.html" %}<span>{{ layout.site_name }}</span></span>
+  <blockquote class="auth-art__quote">
+    <p>{% block auth_quote %}Every page, one layout: change it once and the whole site follows.{% endblock %}</p>
+    <footer>{% block auth_quote_by %}{{ layout.site_name }}{% endblock %}</footer>
+  </blockquote>
+</aside>
+<header class="auth-header">
+  <a class="brand" href="{{ layout.home_url|default:'/' }}">{% include "layout/partials/logo.html" %}<span>{{ layout.site_name }}</span></a>
+  <a href="{{ layout.home_url|default:'/' }}">&larr; Back to the website</a>
+</header>
+{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+{% block footer %}<footer class="auth-footer">&copy; {% now "Y" %} {{ layout.site_name }}</footer>{% endblock %}

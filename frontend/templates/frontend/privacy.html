@@ -1,0 +1,20 @@
+{% extends "layout/pages/legal.html" %}
+{% block title %}Privacy{% endblock %}
+{% block heading %}Privacy{% endblock %}
+{% block band_text %}Last updated 4 November 2026. Sample text: replace it with your own.{% endblock %}
+{% block toc %}
+<li><a href="#collect">What we collect</a></li>
+<li><a href="#use">How we use it</a></li>
+<li><a href="#cookies">Cookies</a></li>
+<li><a href="#rights">Your rights</a></li>
+{% endblock %}
+{% block legal_text %}
+<h2 id="collect">What we collect</h2>
+<p>When you create an account we keep your username, your email address and your layout preferences. Passwords are stored only as secure hashes.</p>
+<h2 id="use">How we use it</h2>
+<p>We use your details to let you sign in and to send password reset emails you ask for. We don't sell or share them.</p>
+<h2 id="cookies">Cookies</h2>
+<p>We use only the cookies needed for signing in and for protecting forms (CSRF).</p>
+<h2 id="rights">Your rights</h2>
+<p>You can change your details on your profile page, or <a href="{% url 'frontend:contact' %}">contact us</a> to have your account removed.</p>
+{% endblock %}

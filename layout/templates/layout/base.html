@@ -1,0 +1,74 @@
+{% load static %}<!doctype html>
+{% comment %}
+  The one HTML skeleton. Every page reaches it through a layout:
+      layout/public.html   public pages (header, footer)
+      layout/user.html     signed-in visitors (public + account sidebar)
+      layout/auth.html     sign-in, sign-up and password pages (split screen: picture + form)
+      layout/admin.html    the staff area (admin header + dark sidebar)
+      layout/plain.html    just the page: no header, menus or footer (maintenance, print, embedded)
+      layout/pages/*.html  page layouts on top of public.html: home, banner, band, listing, detail, article, legal, centered
+  Blocks: title, description, meta, styles, layout_class, body_class, nav_mode, loader, header, hero, sidebar,
+          main (wraps everything below, used by private layouts to hide it), breadcrumbs, page_header, heading, page_actions, content, footer, toasts, modals, scripts.
+  modals: <template>s for modals this layout needs (public.html puts the account modal here; others need none).
+  nav_mode is one of: solid (default), transparent (header over the picture until you scroll), static.
+  Messages from the view (messages.success…) show as toasts. Behaviour: js/layout.js, js/feedback.js, js/fields.js.
+  To hide a part on one page, empty its block there, e.g.  {% block breadcrumbs %}{% endblock %}
+{% endcomment %}
+<html lang="en" data-theme="{{ layout.prefs.theme|default:'light' }}" data-density="{{ layout.prefs.density|default:'comfortable' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}{% endblock %} | {{ layout.site_name|default:"Site" }}</title>
+  <meta name="description" content="{% block description %}{{ layout.description }}{% endblock %}">
+  {% block meta %}{% endblock %}
+  <link rel="icon" href="{% static 'layout/img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'layout/css/layout.css' %}">
+  {% block styles %}{% endblock %}
+  <script src="{% static 'layout/js/layout.js' %}" defer></script>
+  <script src="{% static 'layout/js/feedback.js' %}" defer></script>
+  <script src="{% static 'layout/js/fields.js' %}" defer></script>
+</head>
+<body class="{% block layout_class %}{% endblock %} sidebar-{{ layout.prefs.sidebar|default:'expanded' }} {% block body_class %}{% endblock %}" data-nav="{% block nav_mode %}solid{% endblock %}" data-navigate="{{ layout.loader.navigate|default:'bar' }}" data-icons="{% static 'layout/img/icons.svg' %}">
+  <a class="skip-link" href="#main">Skip to content</a>
+  {% block loader %}
+  {# The page loader (covers the page until it is ready; it also fades out by itself) and the thin progress line. #}
+  {% if layout.loader.page %}
+  <div class="page-loader" data-page-loader role="status" aria-live="polite">
+    {% if layout.loader.style == "pulse" %}<span class="spinner spinner--pulse spinner--lg" aria-hidden="true"><img src="{% static 'layout/img/favicon.svg' %}" alt="" width="48" height="48"></span>
+    {% elif layout.loader.style == "dots" %}<span class="spinner spinner--dots spinner--lg" aria-hidden="true"><span></span><span></span><span></span></span>
+    {% else %}<span class="spinner spinner--spinner spinner--lg" aria-hidden="true"></span>{% endif %}
+    <p class="page-loader__text">{{ layout.loader.text }}</p>
+  </div>
+  {% endif %}
+  <div class="progress-line" data-progress aria-hidden="true"></div>
+  {% endblock %}
+  {% block header %}{% endblock %}
+  {% block hero %}{% endblock %}
+  <div class="shell">
+    {% block sidebar %}{% endblock %}
+    <main id="main" class="main" tabindex="-1">
+      {% block main %}
+      {% block breadcrumbs %}{% include "layout/partials/breadcrumbs.html" %}{% endblock %}
+      {% block page_header %}<header class="page-header"><h1>{% block heading %}{% endblock %}</h1>{% block page_actions %}{% endblock %}</header>{% endblock %}
+      {% block content %}{% endblock %}
+      {% endblock main %}
+    </main>
+  </div>
+  {% block footer %}{% endblock %}
+  {% block toasts %}
+  {# Toasts: Django's messages (messages.success(request, "Saved")…) appear here. Position and time: LAYOUT["TOASTS"]. #}
+  <div class="toasts" data-toasts data-position="{{ layout.toasts.position|default:'top-right' }}" data-duration="{{ layout.toasts.duration|default:4000 }}">
+    {% for message in messages %}
+    <div class="toast toast--{{ message.level_tag|default:'info' }}" role="{% if message.level_tag == 'error' %}alert{% else %}status{% endif %}">
+      <span class="toast__icon">{% if message.level_tag == "success" %}{% include "layout/partials/icon.html" with name="check" %}{% elif message.level_tag == "error" or message.level_tag == "warning" %}{% include "layout/partials/icon.html" with name="alert" %}{% else %}{% include "layout/partials/icon.html" with name="info" %}{% endif %}</span>
+      <div class="toast__body"><p class="toast__message">{{ message }}</p></div>
+      <button type="button" class="toast__close" data-toast-close aria-label="Dismiss">{% include "layout/partials/icon.html" with name="x" %}</button>
+      <span class="toast__time" aria-hidden="true"></span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endblock %}
+  {% block modals %}{% endblock %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,198 @@
+{% extends "layout/pages/band.html" %}
+{% load static %}
+{% comment %}The layout gallery (layout/views.py → gallery): every layout part in action, each with the attribute that makes
+it work (no JavaScript written in the page). Open while developing (DEBUG) or for staff; elsewhere it doesn't exist.{% endcomment %}
+{% block title %}Layout gallery{% endblock %}
+{% block heading %}Layout <em>gallery</em>{% endblock %}
+{% block band_text %}Every reusable part of the layout app: toasts, loaders, modals, the account modal, fields, tabs and layouts.{% endblock %}
+{% block modals %}{{ block.super }}{% include "layout/partials/auth_modal.html" with login_action=request.path signup_action=request.path modal_id="demo-auth-modal" %}{% endblock %}
+{% block content %}
+<section class="section panel">
+  <h2>Toasts</h2>
+  <p>Messages from the server (<code>messages.success(request, "…")</code>) appear like these. Position and time: <code>LAYOUT["TOASTS"]</code>.</p>
+  <div class="demo-row">
+    <button type="button" class="button" data-toast='{"message": "Your changes are saved.", "type": "success", "title": "Saved"}'>Success</button>
+    <button type="button" class="button button--outline" data-toast='{"message": "A new version is available.", "type": "info"}'>Info</button>
+    <button type="button" class="button button--outline" data-toast='{"message": "Your session ends in 5 minutes.", "type": "warning"}'>Warning</button>
+    <button type="button" class="button button--danger" data-toast='{"message": "That did not work. Please try again.", "type": "error", "title": "Error"}'>Error</button>
+    <button type="button" class="button button--outline" data-toast='{"message": "Shown at the bottom, stays until closed.", "position": "bottom-center", "duration": 0}'>Bottom, no timer</button>
+  </div>
+</section>
+
+<section class="section panel">
+  <h2>Loading</h2>
+  <p>A loader for a few seconds (in real use it stays until the next page arrives), and the three loader styles.</p>
+  <div class="demo-row">
+    <button type="button" class="button" data-loading='{"text": "Saving your changes", "ms": 2000}'>In the middle</button>
+    <button type="button" class="button button--outline" data-loading='{"text": "Uploading", "place": "bottom-right", "style": "dots", "ms": 2500}'>In a corner</button>
+    <button type="button" class="button button--outline" data-loading='{"text": "Preparing", "place": "fullscreen", "ms": 1500}'>Full screen</button>
+  </div>
+  <div class="demo-row"><span class="spinner spinner--spinner spinner--md" aria-hidden="true"></span><span class="spinner spinner--dots spinner--md" aria-hidden="true"><span></span><span></span><span></span></span><span class="spinner spinner--pulse spinner--md" aria-hidden="true"><img src="{% static 'layout/img/favicon.svg' %}" alt="" width="48" height="48"></span></div>
+</section>
+
+<section class="section panel">
+  <h2>Account modal</h2>
+  <p>The sign-in / register modal from the header. On real pages the Register tab only appears once an accounts app
+     sets <code>LAYOUT["ACCOUNT"]["SIGNUP_URL"]</code>. Here both tabs are shown; the forms only post back to this page.</p>
+  <div class="demo-row">
+    <button type="button" class="button" data-modal='{"template": "#demo-auth-modal", "label": "Sign in or create an account", "size": "md", "tab": "signin"}'>Sign in tab</button>
+    <button type="button" class="button button--outline" data-modal='{"template": "#demo-auth-modal", "label": "Sign in or create an account", "size": "md", "tab": "register"}'>Register tab</button>
+  </div>
+</section>
+
+<section class="section panel" id="modals">
+  <h2>Modals and confirm boxes</h2>
+  <div class="demo-row">
+    <a class="button" href="#modals" data-modal='{"template": "#demo-modal", "title": "Terms of use", "size": "md"}'>Open a modal</a>
+    <button type="button" class="button button--outline" data-modal='{"template": "#demo-panel", "title": "Filters", "place": "right"}'>Side panel</button>
+    <a class="button button--outline" href="{{ layout.home_url }}" data-confirm='{"title": "Leave this page?", "message": "You will go back to the home page.", "confirm": "Leave"}'>Confirm before leaving</a>
+    <button type="button" class="button button--danger" data-confirm='{"title": "Delete this item?", "message": "This cannot be undone.", "confirm": "Delete", "danger": true}' data-toast='{"message": "Deleted (not really: this is a demo).", "type": "success"}'>Delete…</button>
+  </div>
+  <template id="demo-modal">
+    <p>A modal's content is a <code>&lt;template&gt;</code> in the page. Without JavaScript the button is a normal link to the terms page.</p>
+    <p><button type="button" class="button" data-modal-close>Got it</button></p>
+  </template>
+  <template id="demo-panel">
+    <form class="form" method="get" action="">
+      <div class="field" data-field data-type="search"><label class="field__label" for="demo-q">Search stories</label>
+        <div class="field__control"><span class="field__icon" aria-hidden="true">{% include "layout/partials/icon.html" with name="search" %}</span><input id="demo-q" type="search" name="q"><span class="field__end"><button type="button" class="field__btn" data-field-clear aria-label="Clear" hidden>{% include "layout/partials/icon.html" with name="x" %}</button></span></div>
+      </div>
+      <button type="submit" class="button">Show results</button>
+    </form>
+  </template>
+</section>
+
+<section class="section panel">
+  <h2>Fields with icons and live error messages</h2>
+  <p>Leave a field empty or type a wrong email: the message appears at once, the same one the server would give.</p>
+  <form class="form" method="post" novalidate data-loading='{"text": "Checking"}'>
+    {% csrf_token %}
+
+    {% if form.errors %}
+      <div class="form-errors" role="alert">
+        {% include "layout/partials/icon.html" with name="alert" %}
+        <p>Please check the highlighted fields.</p>
+      </div>
+    {% endif %}
+
+    {# Text with an icon and the ✕ button #}
+    <div class="field{% if form.name.errors %} is-invalid{% endif %}" data-field data-type="text">
+      <label class="field__label" for="id_name">Name <span class="field__req">*</span></label>
+      <div class="field__control">
+        <span class="field__icon">{% include "layout/partials/icon.html" with name="user" %}</span>
+        <input type="text" id="id_name" name="name" minlength="2" maxlength="40" required value="{{ form.name.value|default_if_none:'' }}">
+        <span class="field__end">
+          <button type="button" class="field__btn" data-field-clear aria-label="Clear name" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+        </span>
+      </div>
+      <p class="field__error">{{ form.name.errors.0 }}</p>
+    </div>
+
+    {# Email #}
+    <div class="field{% if form.email.errors %} is-invalid{% endif %}" data-field data-type="email">
+      <label class="field__label" for="id_email">Email <span class="field__req">*</span></label>
+      <div class="field__control">
+        <span class="field__icon">{% include "layout/partials/icon.html" with name="mail" %}</span>
+        <input type="email" id="id_email" name="email" required value="{{ form.email.value|default_if_none:'' }}">
+        <span class="field__end">
+          <button type="button" class="field__btn" data-field-clear aria-label="Clear email" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+        </span>
+      </div>
+      <p class="field__error">{{ form.email.errors.0 }}</p>
+    </div>
+
+    {# Website: an icon at the end as well #}
+    <div class="field{% if form.website.errors %} is-invalid{% endif %}" data-field data-type="url">
+      <label class="field__label" for="id_website">Website</label>
+      <div class="field__control">
+        <span class="field__icon">{% include "layout/partials/icon.html" with name="link" %}</span>
+        <input type="url" id="id_website" name="website" value="{{ form.website.value|default_if_none:'' }}">
+        <span class="field__end">
+          <button type="button" class="field__btn" data-field-clear aria-label="Clear website" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+          <span class="field__end-icon">{% include "layout/partials/icon.html" with name="globe" %}</span>
+        </span>
+      </div>
+      <p class="field__error">{{ form.website.errors.0 }}</p>
+    </div>
+
+    {# Phone: country-code list + number #}
+    <div class="field{% if form.phone.errors %} is-invalid{% endif %}" data-field data-type="phone">
+      <label class="field__label" for="id_phone_1">Phone <span class="field__req">*</span></label>
+      <div class="field__control">
+        <div class="phone" data-phone>
+          <select id="id_phone_0" name="phone_0" class="phone__country" aria-label="Country calling code" data-phone-country>
+            {% for code, name, dial, min_digits, max_digits in countries %}
+              <option value="{{ code }}" data-name="{{ name }}" data-dial="{{ dial }}" data-min="{{ min_digits }}" data-max="{{ max_digits }}"{% if code == phone_country %} selected{% endif %}>{{ name }} (+{{ dial }})</option>
+            {% endfor %}
+          </select>
+          <input type="tel" id="id_phone_1" name="phone_1" inputmode="tel" required value="{{ form.data.phone_1|default:'' }}">
+        </div>
+        <span class="field__end">
+          <button type="button" class="field__btn" data-field-clear aria-label="Clear phone" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+        </span>
+      </div>
+      <p class="field__error">{{ form.phone.errors.0 }}</p>
+    </div>
+
+    {# Password: ✕ and the eye #}
+    <div class="field{% if form.password.errors %} is-invalid{% endif %}" data-field data-type="password">
+      <label class="field__label" for="id_password">Password <span class="field__req">*</span></label>
+      <div class="field__control">
+        <span class="field__icon">{% include "layout/partials/icon.html" with name="lock" %}</span>
+        <input type="password" id="id_password" name="password" minlength="8" required>
+        <span class="field__end">
+          <button type="button" class="field__btn" data-field-clear aria-label="Clear password" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+          <button type="button" class="field__btn" data-field-eye aria-label="Show password" aria-pressed="false">{% include "layout/partials/icon.html" with name="eye" %}</button>
+        </span>
+      </div>
+      <p class="field__error">{{ form.password.errors.0 }}</p>
+    </div>
+
+    {# Any icon you like #}
+    <div class="field" data-field data-type="text">
+      <label class="field__label" for="id_city">City</label>
+      <div class="field__control">
+        <span class="field__icon">{% include "layout/partials/icon.html" with name="map" %}</span>
+        <input type="text" id="id_city" name="city" value="{{ form.city.value|default_if_none:'' }}">
+        <span class="field__end">
+          <button type="button" class="field__btn" data-field-clear aria-label="Clear city" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+        </span>
+      </div>
+      <p class="field__help">Any field can have its own icon.</p>
+      <p class="field__error"></p>
+    </div>
+
+    {# Checkbox #}
+    <div class="field field--check{% if form.agree.errors %} is-invalid{% endif %}" data-field data-type="checkbox">
+      <label class="check"><input type="checkbox" name="agree" required{% if form.agree.value %} checked{% endif %}><span>I agree to the terms <span class="field__req">*</span></span></label>
+      <p class="field__error">{{ form.agree.errors.0 }}</p>
+    </div>
+
+    <p><button type="submit" class="button">Send</button></p>
+  </form>
+</section>
+
+<section class="section panel">
+  <h2>Tabs</h2>
+  <div data-tabs>
+    <div role="tablist" aria-label="Example tabs">
+      <button type="button" role="tab" id="tab-a" aria-controls="panel-a" aria-selected="true">Overview</button>
+      <button type="button" role="tab" id="tab-b" aria-controls="panel-b" aria-selected="false" tabindex="-1">Details</button>
+      <button type="button" role="tab" id="tab-c" aria-controls="panel-c" aria-selected="false" tabindex="-1">Reviews</button>
+    </div>
+    <div role="tabpanel" id="panel-a" aria-labelledby="tab-a"><p>The first tab. Use the arrow keys to move between tabs.</p></div>
+    <div role="tabpanel" id="panel-b" aria-labelledby="tab-b" hidden><p>The second tab.</p></div>
+    <div role="tabpanel" id="panel-c" aria-labelledby="tab-c" hidden><p>The third tab.</p></div>
+  </div>
+</section>
+
+<section class="section panel">
+  <h2>More layouts</h2>
+  <ul class="ticks">
+    <li>{% include "layout/partials/icon.html" with name="check" %}<a href="{% url 'layout:gallery_plain' %}">Plain layout</a>: no header, menus or footer.</li>
+    <li>{% include "layout/partials/icon.html" with name="check" %}<a href="{% url 'layout:preferences' %}">User layout</a>: private, for signed-in people.</li>
+    <li>{% include "layout/partials/icon.html" with name="check" %}<a href="{% url 'layout:staff_home' %}">Admin layout</a>: staff only.</li>
+    <li>{% include "layout/partials/icon.html" with name="check" %}This page uses the band layout; the website shows the home, banner, listing, detail, article, legal and centered layouts.</li>
+  </ul>
+</section>
+{% endblock %}

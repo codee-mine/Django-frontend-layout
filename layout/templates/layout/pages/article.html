@@ -1,0 +1,4 @@
+{% extends "layout/pages/band.html" %}
+{% comment %}Article layout: the band, then one comfortable reading column (headings, quotes, lists styled).
+Fill: title, heading, band_text (e.g. the date), article.{% endcomment %}
+{% block content %}<article class="prose">{% block article %}{% endblock %}</article>{% endblock %}

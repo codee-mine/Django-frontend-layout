@@ -1,0 +1,19 @@
+{% extends "layout/public.html" %}
+{% load static %}
+{% comment %}Banner layout: a picture strip with the heading, breadcrumbs and a short text; the page below.
+Fill: title, heading, banner_text, banner_actions, content.  Optional: banner_image (a picture's URL).{% endcomment %}
+{% block nav_mode %}transparent{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+{% block page_header %}{% endblock %}
+{% block hero %}
+<section class="banner">
+  <img class="banner__bg" src="{% block banner_image %}{% static 'layout/img/scene-2.svg' %}{% endblock %}" alt="" width="1600" height="900">
+  <span class="banner__shade"></span>
+  <div class="banner__inner">
+    {% include "layout/partials/breadcrumbs.html" %}
+    <h1 class="banner__title">{% block heading %}{% endblock %}</h1>
+    <p class="banner__text">{% block banner_text %}{% endblock %}</p>
+    <div class="banner__actions">{% block banner_actions %}{% endblock %}</div>
+  </div>
+</section>
+{% endblock %}

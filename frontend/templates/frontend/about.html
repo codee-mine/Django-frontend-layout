@@ -1,0 +1,22 @@
+{% extends "layout/pages/banner.html" %}
+{% block title %}About{% endblock %}
+{% block heading %}About <em>us</em>{% endblock %}
+{% block banner_text %}Who we are and how this site is made.{% endblock %}
+{% block content %}
+<div class="with-aside">
+  <div class="prose">
+    <h2>One shared layout</h2>
+    <p>This page only provides its own text. The header, menu, banner, breadcrumbs, messages and footer come from the layout app.</p>
+    <blockquote>Change the layout once, and every page follows.</blockquote>
+    <p>Signed-in visitors get their own area, and staff get a separate one, each with its own layout.</p>
+  </div>
+  <aside class="panel aside-box">
+    <h2>Find out more</h2>
+    <ul class="ticks">
+      <li>{% include "layout/partials/icon.html" with name="check" %}<a href="{% url 'frontend:guide' %}">How it's built</a></li>
+      <li>{% include "layout/partials/icon.html" with name="check" %}<a href="{% url 'frontend:stories' %}">Stories</a></li>
+      <li>{% include "layout/partials/icon.html" with name="check" %}<a href="{% url 'frontend:contact' %}">Contact us</a></li>
+    </ul>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "layout/pages/banner.html" %}
+{% load static %}
+{% comment %}
+  The services page. The picture banner, header and footer come from the layout (layout/pages/banner.html).
+  Everything in the content block is this page's own HTML: steps, prices, text with a picture, pictures, questions.
+{% endcomment %}
+{% block title %}Services{% endblock %}
+{% block banner_image %}{% static 'layout/img/scene-5.svg' %}{% endblock %}
+{% block heading %}Our <em>services</em>{% endblock %}
+{% block banner_text %}What we do, how it works and what it costs.{% endblock %}
+{% block banner_actions %}<a class="button" href="{% url 'frontend:contact' %}">Get in touch</a>{% endblock %}
+
+{% block content %}
+
+{# How it works: three numbered steps #}
+<section class="section">
+  <header class="section-head section-head--center">
+    <p class="label">How it works</p>
+    <h2 class="title">Three simple <em>steps</em></h2>
+  </header>
+  <ol class="steps">
+    <li><h3>Tell us</h3><p>Send a short message about what you need.</p></li>
+    <li><h3>We plan</h3><p>We suggest a plan and a price, with no obligation.</p></li>
+    <li><h3>We build</h3><p>You follow every step and approve the result.</p></li>
+  </ol>
+</section>
+
+{# Prices: three plans, the middle one stands out #}
+<section class="section">
+  <header class="section-head section-head--center">
+    <p class="label">Prices</p>
+    <h2 class="title">Choose your <em>plan</em></h2>
+  </header>
+  <div class="plans">
+    <div class="plan">
+      <h3>Starter</h3>
+      <p class="plan__price">€0</p>
+      <ul class="ticks">
+        <li>{% include "layout/partials/icon.html" with name="check" %}One page</li>
+        <li>{% include "layout/partials/icon.html" with name="check" %}Basic support</li>
+      </ul>
+      <a class="button button--outline button--block" href="{% url 'frontend:contact' %}">Start</a>
+    </div>
+    <div class="plan plan--featured">
+      <h3>Standard</h3>
+      <p class="plan__price">€19</p>
+      <ul class="ticks">
+        <li>{% include "layout/partials/icon.html" with name="check" %}Ten pages</li>
+        <li>{% include "layout/partials/icon.html" with name="check" %}Email support</li>
+        <li>{% include "layout/partials/icon.html" with name="check" %}Your own colours</li>
+      </ul>
+      <a class="button button--block" href="{% url 'frontend:contact' %}">Choose</a>
+    </div>
+    <div class="plan">
+      <h3>Plus</h3>
+      <p class="plan__price">€49</p>
+      <ul class="ticks">
+        <li>{% include "layout/partials/icon.html" with name="check" %}Unlimited pages</li>
+        <li>{% include "layout/partials/icon.html" with name="check" %}Priority support</li>
+        <li>{% include "layout/partials/icon.html" with name="check" %}Staff area</li>
+      </ul>
+      <a class="button button--outline button--block" href="{% url 'frontend:contact' %}">Ask us</a>
+    </div>
+  </div>
+</section>
+
+{# Text with a picture, on a pale background #}
+<section class="section section--pale">
+  <header class="section-head">
+    <p class="label">About the work</p>
+    <h2 class="title">Made <em>with care</em></h2>
+  </header>
+  <div class="text-image">
+    <div class="prose">
+      <p>Every page is built on the same layout, so it looks right on phones and large screens alike.</p>
+      <p>Each page is one template: its words and sections are written right in it.</p>
+      <p><a class="button" href="{% url 'frontend:guide' %}">Read how it is built</a></p>
+    </div>
+    <div class="text-image__media"><img src="{% static 'layout/img/scene-6.svg' %}" alt="" loading="lazy" width="800" height="600"></div>
+  </div>
+</section>
+
+{# Pictures #}
+<section class="section">
+  <header class="section-head">
+    <p class="label">Pictures</p>
+    <h2 class="title">Recent <em>work</em></h2>
+  </header>
+  <div class="gallery">
+    <figure><img src="{% static 'layout/img/scene-1.svg' %}" alt="Mountain light" loading="lazy" width="800" height="600"><figcaption>Mountain light</figcaption></figure>
+    <figure><img src="{% static 'layout/img/scene-2.svg' %}" alt="Blue hour" loading="lazy" width="800" height="600"><figcaption>Blue hour</figcaption></figure>
+    <figure><img src="{% static 'layout/img/scene-3.svg' %}" alt="Dusk" loading="lazy" width="800" height="600"><figcaption>Dusk</figcaption></figure>
+    <figure><img src="{% static 'layout/img/scene-5.svg' %}" alt="Night" loading="lazy" width="800" height="600"><figcaption>Night</figcaption></figure>
+  </div>
+</section>
+
+{# Questions: each one opens on click #}
+<section class="section">
+  <header class="section-head section-head--center">
+    <p class="label">Questions</p>
+    <h2 class="title">Good to <em>know</em></h2>
+  </header>
+  <div class="faq">
+    <details open>
+      <summary>Can I change the colours?{% include "layout/partials/icon.html" with name="plus" %}</summary>
+      <p>Yes: change the variables at the top of layout.css.</p>
+    </details>
+    <details>
+      <summary>Do I need to write code for a new page?{% include "layout/partials/icon.html" with name="plus" %}</summary>
+      <p>Only a little: copy a page, pick a layout and write its words and sections in plain HTML.</p>
+    </details>
+    <details>
+      <summary>Is it safe?{% include "layout/partials/icon.html" with name="plus" %}</summary>
+      <p>Only fixed choices and checked links are accepted, and every view checks permissions.</p>
+    </details>
+  </div>
+</section>
+
+{% endblock %}

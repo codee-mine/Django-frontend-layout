@@ -1,0 +1,17 @@
+{% extends "layout/public.html" %}
+{% comment %}Centered layout: one short message in the middle (errors, "thank you", "coming soon").
+Fill: title, centered_label (e.g. 404), heading, centered_text.  Optional: centered_icon, centered_actions
+(default: a button back to the home page).{% endcomment %}
+{% block breadcrumbs %}{% endblock %}
+{% block page_header %}{% endblock %}
+{% block content %}
+<section class="centered">
+  <div class="centered__inner">
+    <span class="centered__icon">{% block centered_icon %}{% include "layout/partials/icon.html" with name="info" %}{% endblock %}</span>
+    <p class="label">{% block centered_label %}{% endblock %}</p>
+    <h1 class="title">{% block heading %}{% endblock %}</h1>
+    <p class="centered__text">{% block centered_text %}{% endblock %}</p>
+    <div class="centered__actions">{% block centered_actions %}<a class="button" href="{{ layout.home_url|default:'/' }}">Back to the home page</a>{% endblock %}</div>
+  </div>
+</section>
+{% endblock %}

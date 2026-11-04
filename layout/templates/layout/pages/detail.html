@@ -1,0 +1,24 @@
+{% extends "layout/public.html" %}
+{% load static %}
+{% comment %}Detail layout: a big picture header (breadcrumbs, heading, a meta line), then a main column and a side box.
+Fill: title, heading, detail_meta, detail_body, detail_aside.  Optional: detail_image (a picture's URL).{% endcomment %}
+{% block nav_mode %}transparent{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+{% block page_header %}{% endblock %}
+{% block hero %}
+<section class="photo-header">
+  <img class="photo-header__bg" src="{% block detail_image %}{% static 'layout/img/scene-5.svg' %}{% endblock %}" alt="" width="1600" height="900">
+  <span class="photo-header__shade"></span>
+  <div class="photo-header__inner">
+    {% include "layout/partials/breadcrumbs.html" %}
+    <h1 class="photo-header__title">{% block heading %}{% endblock %}</h1>
+    <p class="photo-header__meta">{% block detail_meta %}{% endblock %}</p>
+  </div>
+</section>
+{% endblock %}
+{% block content %}
+<div class="with-aside">
+  <div>{% block detail_body %}{% endblock %}</div>
+  <aside class="aside-box">{% block detail_aside %}{% endblock %}</aside>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "layout/plain.html" %}
+{% load static %}
+{% comment %}An example of the plain layout (no header, menus or footer) as a "back soon" notice: /layout/gallery/plain/.{% endcomment %}
+{% block title %}Back soon{% endblock %}
+{% block page_header %}{% endblock %}
+{% block content %}
+<section class="centered">
+  <div class="centered__inner">
+    <span class="spinner spinner--pulse spinner--lg" aria-hidden="true"><img src="{% static 'layout/img/favicon.svg' %}" alt="" width="48" height="48"></span>
+    <p class="label">Maintenance</p>
+    <h1 class="title">We'll be <em>back soon</em></h1>
+    <p class="centered__text">The site is being updated. Please try again in a few minutes.</p>
+    <div class="centered__actions"><a class="button button--outline" href="{{ layout.home_url }}">Try the home page</a></div>
+  </div>
+</section>
+{% endblock %}

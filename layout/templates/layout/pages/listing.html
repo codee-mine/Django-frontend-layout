@@ -1,0 +1,15 @@
+{% extends "layout/pages/band.html" %}
+{% comment %}Listing layout: the band, an optional toolbar (filters, a count), a grid of cards, page links.
+Fill: title, heading, band_text, toolbar, items (the cards, written in the page).
+Page links appear when the view passes page_obj (django.core.paginator); other GET values (a search, a filter) stay in the links.{% endcomment %}
+{% block content %}
+<div class="toolbar">{% block toolbar %}{% endblock %}</div>
+<div class="cards">{% block items %}{% endblock %}</div>
+{% if page_obj.has_other_pages %}
+<nav class="pagination" aria-label="Pages">
+  {% if page_obj.has_previous %}<a href="{% querystring page=page_obj.previous_page_number %}" rel="prev">Previous</a>{% endif %}
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="{% querystring page=page_obj.next_page_number %}" rel="next">Next</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

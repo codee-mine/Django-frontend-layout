@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Mountain landscape">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#001a3d"/><stop offset="1" stop-color="#DC143C"/></linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffd1b3" stop-opacity="0.9"/><stop offset="1" stop-color="#ffd1b3" stop-opacity="0"/></radialGradient>
+    <linearGradient id="snow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#sky)"/>
+  <circle cx="850" cy="310" r="230" fill="url(#glow)"/>
+  <circle cx="850" cy="310" r="58" fill="#ffd1b3" opacity="0.85"/>
+  <g transform="translate(0 260) scale(1 1.3)">
+    <path d="M0 300 L0 210 L120 150 L210 185 L330 95 L430 160 L520 120 L640 60 L760 140 L880 100 L990 170 L1100 110 L1200 160 L1200 300 Z" fill="#5b1d4d" opacity="0.9"/>
+    <path d="M330 95 L300 128 L345 120 L362 140 L380 110 Z M640 60 L606 100 L650 92 L670 112 L690 84 Z M1100 110 L1072 140 L1110 134 L1126 150 L1140 128 Z" fill="url(#snow)"/>
+  </g>
+  <g transform="translate(0 380) scale(1 1.4)"><path d="M0 300 L0 235 L100 200 L190 230 L300 160 L400 215 L520 175 L610 205 L720 150 L830 210 L940 170 L1060 225 L1200 185 L1200 300 Z" fill="#2b1840"/></g>
+  <g transform="translate(0 470) scale(1 1.15)"><path d="M0 300 L0 265 L140 240 L260 262 L380 228 L500 258 L640 236 L760 262 L900 240 L1040 266 L1200 246 L1200 300 Z" fill="#120a1f"/></g>
+  <rect y="760" width="1200" height="40" fill="#120a1f"/>
+</svg>

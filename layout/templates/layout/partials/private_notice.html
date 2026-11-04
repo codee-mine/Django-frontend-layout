@@ -1,0 +1,10 @@
+{% comment %}Shown by a private layout (user.html, admin.html) instead of its content when the visitor may not see it.
+A safety net only: views must still check access themselves (layout/access.py).{% endcomment %}<section class="centered">
+  <div class="centered__inner">
+    <span class="centered__icon">{% include "layout/partials/icon.html" with name="lock" %}</span>
+    <p class="label">{% if need == "staff" %}Staff only{% else %}Private{% endif %}</p>
+    <h1 class="title">{% if need == "staff" %}Not allowed{% else %}Please sign in{% endif %}</h1>
+    <p class="centered__text">{% if need == "staff" %}This page is only for staff.{% else %}This page is only for signed-in people.{% endif %}</p>
+    <div class="centered__actions">{% if not user.is_authenticated and layout.login_url %}<a class="button" href="{{ layout.login_url }}?next={{ request.path|urlencode }}">Sign in</a>{% endif %}<a class="button button--outline" href="{{ layout.home_url|default:'/' }}">Home page</a></div>
+  </div>
+</section>

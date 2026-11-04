@@ -1,0 +1,3 @@
+{% comment %}A row of links:  {% include "layout/partials/navbar.html" with items=layout.public_nav %}   (label names it for screen readers){% endcomment %}<nav class="navbar" aria-label="{{ label|default:'Main' }}">
+  <ul>{% for item in items %}<li><a href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %}>{{ item.label }}</a></li>{% endfor %}</ul>
+</nav>

@@ -1,0 +1,16 @@
+{% extends "layout/pages/detail.html" %}
+{% load static %}
+{% block title %}{{ story.title }}{% endblock %}
+{% block detail_image %}{% static story.image %}{% endblock %}
+{% block heading %}{{ story.title }}{% endblock %}
+{% block detail_meta %}<span>{{ story.date }}</span><span>{{ story.summary }}</span>{% endblock %}
+{% block detail_body %}
+<div class="prose">{% for paragraph in story.body %}<p>{{ paragraph }}</p>{% endfor %}</div>
+{% endblock %}
+{% block detail_aside %}
+<div class="panel">
+  <h2>More stories</h2>
+  <ul class="ticks">{% for s in others %}<li>{% include "layout/partials/icon.html" with name="check" %}<a href="{% url 'frontend:story' s.slug %}">{{ s.title }}</a></li>{% endfor %}</ul>
+  <a class="button button--outline button--block" href="{% url 'frontend:stories' %}">All stories</a>
+</div>
+{% endblock %}

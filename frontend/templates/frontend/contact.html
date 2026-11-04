@@ -1,0 +1,93 @@
+{% extends "layout/pages/banner.html" %}
+{% load static %}
+{% comment %}
+  The contact page. The banner, header and footer come from the layout; everything below is this page's own HTML.
+  Each field is written out here. The classes (field, field__control…) give the look; data-field turns on the
+  ✕ button and the live checks (layout/js/fields.js). The server checks everything again (frontend/forms.py).
+{% endcomment %}
+{% block title %}Contact{% endblock %}
+{% block banner_image %}{% static 'layout/img/scene-3.svg' %}{% endblock %}
+{% block heading %}Contact <em>us</em>{% endblock %}
+{% block banner_text %}Send us a message and we'll get back to you.{% endblock %}
+
+{% block content %}
+<div class="with-aside">
+
+  <form class="form panel" method="post" novalidate data-loading='{"text": "Sending your message"}'>
+    {% csrf_token %}
+
+    {% if form.errors %}
+      <div class="form-errors" role="alert">
+        {% include "layout/partials/icon.html" with name="alert" %}
+        <p>Please check the highlighted fields.</p>
+      </div>
+    {% endif %}
+
+    {# Name #}
+    <div class="field{% if form.name.errors %} is-invalid{% endif %}" data-field data-type="text">
+      <label class="field__label" for="id_name">Name <span class="field__req">*</span></label>
+      <div class="field__control">
+        <span class="field__icon">{% include "layout/partials/icon.html" with name="user" %}</span>
+        <input type="text" id="id_name" name="name" maxlength="80" required autocomplete="name"
+               value="{{ form.name.value|default_if_none:'' }}">
+        <span class="field__end">
+          <button type="button" class="field__btn" data-field-clear aria-label="Clear name" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+        </span>
+      </div>
+      <p class="field__error" id="id_name_error">{{ form.name.errors.0 }}</p>
+    </div>
+
+    {# Email #}
+    <div class="field{% if form.email.errors %} is-invalid{% endif %}" data-field data-type="email">
+      <label class="field__label" for="id_email">Email <span class="field__req">*</span></label>
+      <div class="field__control">
+        <span class="field__icon">{% include "layout/partials/icon.html" with name="mail" %}</span>
+        <input type="email" id="id_email" name="email" maxlength="120" required autocomplete="email"
+               value="{{ form.email.value|default_if_none:'' }}">
+        <span class="field__end">
+          <button type="button" class="field__btn" data-field-clear aria-label="Clear email" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+        </span>
+      </div>
+      <p class="field__error" id="id_email_error">{{ form.email.errors.0 }}</p>
+    </div>
+
+    {# Phone (optional): a country-code list, then the number. fields.js makes the list searchable. #}
+    <div class="field{% if form.phone.errors %} is-invalid{% endif %}" data-field data-type="phone">
+      <label class="field__label" for="id_phone_1">Phone</label>
+      <div class="field__control">
+        <div class="phone" data-phone>
+          <select id="id_phone_0" name="phone_0" class="phone__country" aria-label="Country calling code" data-phone-country>
+            {% for code, name, dial, min_digits, max_digits in countries %}
+              <option value="{{ code }}" data-name="{{ name }}" data-dial="{{ dial }}" data-min="{{ min_digits }}" data-max="{{ max_digits }}"{% if code == phone_country %} selected{% endif %}>{{ name }} (+{{ dial }})</option>
+            {% endfor %}
+          </select>
+          <input type="tel" id="id_phone_1" name="phone_1" inputmode="tel" autocomplete="tel-national"
+                 value="{{ form.data.phone_1|default:'' }}">
+        </div>
+        <span class="field__end">
+          <button type="button" class="field__btn" data-field-clear aria-label="Clear phone" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+        </span>
+      </div>
+      <p class="field__help">Optional. Pick your country, then type your number.</p>
+      <p class="field__error" id="id_phone_error">{{ form.phone.errors.0 }}</p>
+    </div>
+
+    {# Message #}
+    <div class="field{% if form.message.errors %} is-invalid{% endif %}" data-field data-type="textarea">
+      <label class="field__label" for="id_message">Message <span class="field__req">*</span></label>
+      <div class="field__control">
+        <textarea id="id_message" name="message" rows="5" maxlength="2000" required>{{ form.message.value|default_if_none:'' }}</textarea>
+      </div>
+      <p class="field__error" id="id_message_error">{{ form.message.errors.0 }}</p>
+    </div>
+
+    <p><button type="submit" class="button">Send message</button></p>
+  </form>
+
+  <aside class="panel aside-box">
+    <h2>Other ways</h2>
+    <p>Prefer to read first? Look at <a href="{% url 'frontend:guide' %}">how this site is built</a> or our <a href="{% url 'frontend:stories' %}">stories</a>.</p>
+  </aside>
+
+</div>
+{% endblock %}

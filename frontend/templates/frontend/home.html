@@ -1,0 +1,108 @@
+{% extends "layout/pages/home.html" %}
+{% load static %}
+{% comment %}
+  The home page. The full-screen picture, header and footer come from the layout (layout/pages/home.html).
+  Everything in the content block is this page's own HTML. The classes (section, cards, card, features…) give the look.
+{% endcomment %}
+{% block title %}Home{% endblock %}
+{% block eyebrow %}Welcome{% endblock %}
+{% block hero_title %}{{ layout.site_name }}, <em>one layout</em> for every page{% endblock %}
+{% block hero_actions %}
+  <a class="button" href="{% url 'frontend:services' %}">See what we do</a>
+  <a class="button button--ghost" href="{% url 'frontend:contact' %}">Contact us</a>
+{% endblock %}
+
+{% block content %}
+
+{# Latest stories: three cards #}
+<section class="section">
+  <header class="section-head section-head--center">
+    <p class="label">Latest</p>
+    <h2 class="title">Recent <em>stories</em></h2>
+    <p class="section-head__text">A few short notes on how this site is put together.</p>
+  </header>
+  <div class="cards">
+    {% for story in stories %}
+      <article class="card">
+        <img class="card__image" src="{% static story.image %}" alt="" loading="lazy" width="640" height="400">
+        <div class="card__body">
+          <p class="card__meta">{{ story.date }}</p>
+          <h3 class="card__title">{{ story.title }}</h3>
+          <p>{{ story.summary }}</p>
+          <a class="card__link" href="{% url 'frontend:story' story.slug %}">Read &rarr;</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+{# Why this layout: four features #}
+<section class="section">
+  <header class="section-head">
+    <p class="label">Why this layout</p>
+    <h2 class="title">Every detail, <em>in one place</em></h2>
+  </header>
+  <div class="features">
+    <div class="feature">
+      <span class="feature__icon">{% include "layout/partials/icon.html" with name="layers" %}</span>
+      <h3>One layout</h3>
+      <p>Header, menus and footer come from one app.</p>
+    </div>
+    <div class="feature">
+      <span class="feature__icon">{% include "layout/partials/icon.html" with name="shield" %}</span>
+      <h3>Secure</h3>
+      <p>A strict content security policy and server-side checks.</p>
+    </div>
+    <div class="feature">
+      <span class="feature__icon">{% include "layout/partials/icon.html" with name="sliders" %}</span>
+      <h3>Your choice</h3>
+      <p>Light or dark, roomy or compact, per person.</p>
+    </div>
+    <div class="feature">
+      <span class="feature__icon">{% include "layout/partials/icon.html" with name="zap" %}</span>
+      <h3>Light</h3>
+      <p>No outside libraries: plain Django, CSS and a little JavaScript.</p>
+    </div>
+  </div>
+</section>
+
+{# Numbers on a pale background #}
+<section class="section section--pale">
+  <div class="numbers">
+    <div class="number"><strong>13</strong><span>Layouts</span></div>
+    <div class="number"><strong>10</strong><span>Section kinds</span></div>
+    <div class="number"><strong>0</strong><span>Outside libraries</span></div>
+    <div class="number"><strong>1</strong><span>Stylesheet</span></div>
+  </div>
+</section>
+
+{# Quotes #}
+<section class="section">
+  <header class="section-head">
+    <p class="label">Kind words</p>
+    <h2 class="title">People <em>say</em></h2>
+  </header>
+  <div class="quotes">
+    <blockquote class="quote">
+      {% include "layout/partials/icon.html" with name="quote" %}
+      <p>We changed the colours once and the whole site followed.</p>
+      <footer><strong>A. Editor</strong><span>Content team</span></footer>
+    </blockquote>
+    <blockquote class="quote">
+      {% include "layout/partials/icon.html" with name="quote" %}
+      <p>Adding a page took minutes: pick a layout, fill in the words.</p>
+      <footer><strong>B. Developer</strong><span>Web team</span></footer>
+    </blockquote>
+  </div>
+</section>
+
+{# Call to action on a dark background #}
+<section class="section section--dark">
+  <header class="section-head section-head--center">
+    <h2 class="title">Have a <em>question?</em></h2>
+    <p class="section-head__text">We would be glad to hear from you.</p>
+  </header>
+  <p class="section__more"><a class="button button--ghost" href="{% url 'frontend:contact' %}">Contact us</a></p>
+</section>
+
+{% endblock %}

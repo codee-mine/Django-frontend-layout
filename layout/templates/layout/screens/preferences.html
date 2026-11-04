@@ -1,0 +1,57 @@
+{% extends "layout/user.html" %}
+{% comment %}
+  Each person's layout choices (layout/views.py → preferences). Uses the private user layout.
+  The three choices are written out here as radio buttons; the server only accepts these values (layout/models.py).
+{% endcomment %}
+{% block title %}Layout preferences{% endblock %}
+{% block heading %}Layout preferences{% endblock %}
+
+{% block content %}
+<div class="panel">
+  <p>Only for you: how the site looks when you're signed in.</p>
+
+  <form class="form" method="post" novalidate data-preferences>
+    {% csrf_token %}
+
+    {% if form.errors %}
+      <div class="form-errors" role="alert">
+        {% include "layout/partials/icon.html" with name="alert" %}
+        <p>Please check the highlighted choices.</p>
+      </div>
+    {% endif %}
+
+    {% with theme=form.theme.value sidebar=form.sidebar.value density=form.density.value %}
+
+    <fieldset class="field field--choices{% if form.theme.errors %} is-invalid{% endif %}">
+      <legend>Theme</legend>
+      <div class="radio-row">
+        <label><input type="radio" name="theme" value="light"{% if theme == "light" %} checked{% endif %}> Light</label>
+        <label><input type="radio" name="theme" value="dark"{% if theme == "dark" %} checked{% endif %}> Dark</label>
+      </div>
+      <p class="field__error">{{ form.theme.errors.0 }}</p>
+    </fieldset>
+
+    <fieldset class="field field--choices{% if form.sidebar.errors %} is-invalid{% endif %}">
+      <legend>Sidebar</legend>
+      <div class="radio-row">
+        <label><input type="radio" name="sidebar" value="expanded"{% if sidebar == "expanded" %} checked{% endif %}> Expanded</label>
+        <label><input type="radio" name="sidebar" value="collapsed"{% if sidebar == "collapsed" %} checked{% endif %}> Collapsed (icons only)</label>
+      </div>
+      <p class="field__error">{{ form.sidebar.errors.0 }}</p>
+    </fieldset>
+
+    <fieldset class="field field--choices{% if form.density.errors %} is-invalid{% endif %}">
+      <legend>Spacing</legend>
+      <div class="radio-row">
+        <label><input type="radio" name="density" value="comfortable"{% if density == "comfortable" %} checked{% endif %}> Comfortable</label>
+        <label><input type="radio" name="density" value="compact"{% if density == "compact" %} checked{% endif %}> Compact</label>
+      </div>
+      <p class="field__error">{{ form.density.errors.0 }}</p>
+    </fieldset>
+
+    {% endwith %}
+
+    <p><button type="submit" class="button">Save preferences</button></p>
+  </form>
+</div>
+{% endblock %}

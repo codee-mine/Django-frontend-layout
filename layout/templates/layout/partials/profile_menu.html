@@ -1,0 +1,15 @@
+{% comment %}The signed-in user's menu, or sign-in / sign-up links. Everything comes from settings.LAYOUT["ACCOUNT"]:
+links in the menu (ACCOUNT_NAV), and where signing in, signing up and signing out happen. A link whose page doesn't
+exist yet is simply left out, so apps can be added later. Signing out is a POST with a CSRF token.
+"Sign in" and "Create account" open the account modal (partials/auth_modal.html) on its own tab; without JavaScript
+they open the sign-in page.{% endcomment %}{% if user.is_authenticated %}
+<details class="profile-menu">
+  <summary>{% include "layout/partials/icon.html" with name="user" %}<span>{{ user.get_short_name|default:user.get_username }}</span></summary>
+  <div class="profile-menu__panel">
+    {% for item in layout.account_nav %}<a href="{{ item.url }}">{{ item.label }}</a>{% endfor %}
+    {% if layout.logout_url %}<form method="post" action="{{ layout.logout_url }}" data-confirm='{"title": "Sign out?", "message": "You can sign in again at any time.", "confirm": "Sign out"}'>{% csrf_token %}<button type="submit" class="link-button danger">Sign out</button></form>{% endif %}
+  </div>
+</details>
+{% elif layout.login_url or layout.signup_url %}
+<div class="auth-links">{% if layout.login_url %}<a href="{{ layout.login_url }}?next={{ request.get_full_path|urlencode }}"{% if layout.account_modal %} data-modal='{"template": "#auth-modal", "label": "Sign in or create an account", "size": "md", "tab": "signin"}'{% endif %}>Sign in</a>{% endif %}{% if layout.signup_url %}<a class="button button--small" href="{{ layout.signup_url }}"{% if layout.account_modal %} data-modal='{"template": "#auth-modal", "label": "Sign in or create an account", "size": "md", "tab": "register"}'{% endif %}>Create account</a>{% endif %}</div>
+{% endif %}

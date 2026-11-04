@@ -1,0 +1,23 @@
+{% comment %}A side menu:  {% include "layout/partials/sidebar.html" with items=layout.user_nav title="Your account" show_user=True %}
+- items come from settings (links, headings, groups that open, badges): see layout/context_processors.py
+- the ⇤ button folds it to icons (remembered in this browser); on phones it slides in from the side (the menu button)
+- show_user adds the signed-in person's initial, name and email at the top.{% endcomment %}<button type="button" class="sidebar-open" data-sidebar-open aria-controls="sidebar" aria-expanded="false">{% include "layout/partials/icon.html" with name="menu" %}<span>{{ title }}</span></button>
+<aside class="sidebar" id="sidebar" aria-label="{{ title }}" data-sidebar>
+  <div class="sidebar__head">
+    <p class="sidebar__title">{{ title }}</p>
+    <button type="button" class="sidebar__btn sidebar__collapse" data-sidebar-collapse aria-label="Fold the menu" title="Fold or unfold the menu">{% include "layout/partials/icon.html" with name="sidebar" %}</button>
+    <button type="button" class="sidebar__btn sidebar__close" data-sidebar-close aria-label="Close the menu">{% include "layout/partials/icon.html" with name="x" %}</button>
+  </div>
+  {% if show_user and user.is_authenticated %}<div class="sidebar__user"><span class="avatar" aria-hidden="true">{{ user.get_username|first|upper }}</span><div><strong>{{ user.get_full_name|default:user.get_username }}</strong>{% if user.email %}<small>{{ user.email }}</small>{% endif %}</div></div>{% endif %}
+  <nav><ul>
+    {% for item in items %}
+      {% if item.heading %}<li class="sidebar__heading">{{ item.heading }}</li>
+      {% elif item.children %}<li><details class="sidebar__group"{% if item.active %} open{% endif %}>
+        <summary title="{{ item.label }}">{% include "layout/partials/icon.html" with name=item.icon %}<span class="sidebar__label">{{ item.label }}</span>{% include "layout/partials/icon.html" with name="chevron-down" %}</summary>
+        <ul>{% for child in item.children %}<li><a href="{{ child.url }}"{% if child.active %} aria-current="page"{% endif %} title="{{ child.label }}">{% include "layout/partials/icon.html" with name=child.icon %}<span class="sidebar__label">{{ child.label }}</span>{% if child.badge %}<span class="badge" aria-label="{{ child.badge }} new">{{ child.badge }}</span>{% endif %}</a></li>{% endfor %}</ul>
+      </details></li>
+      {% else %}<li><a href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %} title="{{ item.label }}">{% include "layout/partials/icon.html" with name=item.icon %}<span class="sidebar__label">{{ item.label }}</span>{% if item.badge %}<span class="badge" aria-label="{{ item.badge }} new">{{ item.badge }}</span>{% endif %}</a></li>{% endif %}
+    {% endfor %}
+  </ul></nav>
+</aside>
+<div class="sidebar-backdrop" data-sidebar-close hidden></div>

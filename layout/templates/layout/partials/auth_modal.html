@@ -1,0 +1,131 @@
+{% comment %}
+  The account modal. It is a <template>, so nothing shows until "Sign in" opens it.
+  The layout only draws the fields; the forms post to the addresses of the app that handles accounts:
+      {% include "layout/partials/auth_modal.html" with login_action=… signup_action=… reset_url=… modal_id="auth-modal" %}
+  The Register tab only appears when signup_action is given (a sign-up page exists).
+  public.html includes it with the addresses from settings.LAYOUT["ACCOUNT"]; no other layout needs it.
+{% endcomment %}
+<template id="{{ modal_id }}">
+  <div class="auth-modal"{% if signup_action %} data-tabs{% endif %}>
+
+    <div class="auth-modal__head">
+      <span class="brand">{% include "layout/partials/logo.html" %}<span>{{ layout.site_name }}</span></span>
+      <p>{% if signup_action %}Welcome. Sign in, or create an account.{% else %}Welcome back. Please sign in.{% endif %}</p>
+    </div>
+
+    {% if signup_action %}
+    <div role="tablist" aria-label="Account">
+      <button type="button" role="tab" id="{{ modal_id }}-tab-signin" data-tab="signin" aria-controls="{{ modal_id }}-signin" aria-selected="true">Sign in</button>
+      <button type="button" role="tab" id="{{ modal_id }}-tab-register" data-tab="register" aria-controls="{{ modal_id }}-register" aria-selected="false" tabindex="-1">Register</button>
+    </div>
+    {% endif %}
+
+    {# ---------- Sign in ---------- #}
+    <div id="{{ modal_id }}-signin"{% if signup_action %} role="tabpanel" aria-labelledby="{{ modal_id }}-tab-signin"{% endif %}>
+      <form class="form" method="post" action="{{ login_action }}" novalidate data-loading='{"text": "Signing in"}'>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <input type="hidden" name="form" value="signin">
+
+        <div class="field" data-field data-type="text">
+          <label class="field__label" for="{{ modal_id }}-username">Username <span class="field__req">*</span></label>
+          <div class="field__control">
+            <span class="field__icon">{% include "layout/partials/icon.html" with name="user" %}</span>
+            <input type="text" id="{{ modal_id }}-username" name="username" maxlength="150" required autocomplete="username">
+            <span class="field__end">
+              <button type="button" class="field__btn" data-field-clear aria-label="Clear username" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+            </span>
+          </div>
+          <p class="field__error"></p>
+        </div>
+
+        <div class="field" data-field data-type="password">
+          <label class="field__label" for="{{ modal_id }}-password">Password <span class="field__req">*</span></label>
+          <div class="field__control">
+            <span class="field__icon">{% include "layout/partials/icon.html" with name="lock" %}</span>
+            <input type="password" id="{{ modal_id }}-password" name="password" required autocomplete="current-password">
+            <span class="field__end">
+              <button type="button" class="field__btn" data-field-clear aria-label="Clear password" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+              <button type="button" class="field__btn" data-field-eye aria-label="Show password" aria-pressed="false">{% include "layout/partials/icon.html" with name="eye" %}</button>
+            </span>
+          </div>
+          <p class="field__error"></p>
+        </div>
+
+        {% if reset_url %}<p class="auth-modal__row"><a href="{{ reset_url }}">Forgot your password?</a></p>{% endif %}
+        <button type="submit" class="button button--block">Sign in</button>
+      </form>
+    </div>
+
+    {# ---------- Register (only when a sign-up page exists) ---------- #}
+    {% if signup_action %}
+    <div id="{{ modal_id }}-register" class="auth-modal__register" role="tabpanel" aria-labelledby="{{ modal_id }}-tab-register" hidden>
+      <form class="form" method="post" action="{{ signup_action }}" novalidate data-loading='{"text": "Creating your account"}'>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <input type="hidden" name="form" value="register">
+
+        <div class="field" data-field data-type="text">
+          <label class="field__label" for="{{ modal_id }}-new-username">Username <span class="field__req">*</span></label>
+          <div class="field__control">
+            <span class="field__icon">{% include "layout/partials/icon.html" with name="user" %}</span>
+            <input type="text" id="{{ modal_id }}-new-username" name="username" maxlength="150" required autocomplete="username">
+            <span class="field__end">
+              <button type="button" class="field__btn" data-field-clear aria-label="Clear username" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+            </span>
+          </div>
+          <p class="field__error"></p>
+        </div>
+
+        <div class="field" data-field data-type="email">
+          <label class="field__label" for="{{ modal_id }}-email">Email <span class="field__req">*</span></label>
+          <div class="field__control">
+            <span class="field__icon">{% include "layout/partials/icon.html" with name="mail" %}</span>
+            <input type="email" id="{{ modal_id }}-email" name="email" maxlength="254" required autocomplete="email">
+            <span class="field__end">
+              <button type="button" class="field__btn" data-field-clear aria-label="Clear email" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+            </span>
+          </div>
+          <p class="field__error"></p>
+        </div>
+
+        <div class="field" data-field data-type="password">
+          <label class="field__label" for="{{ modal_id }}-password1">Password <span class="field__req">*</span></label>
+          <div class="field__control">
+            <span class="field__icon">{% include "layout/partials/icon.html" with name="lock" %}</span>
+            <input type="password" id="{{ modal_id }}-password1" name="password1" minlength="8" required autocomplete="new-password">
+            <span class="field__end">
+              <button type="button" class="field__btn" data-field-clear aria-label="Clear password" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+              <button type="button" class="field__btn" data-field-eye aria-label="Show password" aria-pressed="false">{% include "layout/partials/icon.html" with name="eye" %}</button>
+            </span>
+          </div>
+          <p class="field__help">At least 8 characters, not too common, not only numbers.</p>
+          <p class="field__error"></p>
+        </div>
+
+        {# data-match: must be the same as the first password #}
+        <div class="field" data-field data-type="password" data-match="{{ modal_id }}-password1">
+          <label class="field__label" for="{{ modal_id }}-password2">Repeat password <span class="field__req">*</span></label>
+          <div class="field__control">
+            <span class="field__icon">{% include "layout/partials/icon.html" with name="lock" %}</span>
+            <input type="password" id="{{ modal_id }}-password2" name="password2" required autocomplete="new-password">
+            <span class="field__end">
+              <button type="button" class="field__btn" data-field-clear aria-label="Clear password" hidden>{% include "layout/partials/icon.html" with name="x" %}</button>
+              <button type="button" class="field__btn" data-field-eye aria-label="Show password" aria-pressed="false">{% include "layout/partials/icon.html" with name="eye" %}</button>
+            </span>
+          </div>
+          <p class="field__error"></p>
+        </div>
+
+        <div class="field field--check" data-field data-type="checkbox">
+          <label class="check"><input type="checkbox" name="terms" required><span>I agree to the terms of use <span class="field__req">*</span></span></label>
+          <p class="field__error"></p>
+        </div>
+
+        <button type="submit" class="button button--block">Create account</button>
+      </form>
+    </div>
+    {% endif %}
+
+  </div>
+</template>

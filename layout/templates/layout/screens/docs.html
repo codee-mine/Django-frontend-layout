@@ -1,0 +1,589 @@
+{% extends "layout/pages/legal.html" %}
+{% comment %}The layout guide (layout/views.py → docs, /layout/docs/). Open while DEBUG is on, otherwise staff only.
+Code examples sit inside verbatim tags, so they are shown, never run. Keep this page in step with the layout app.{% endcomment %}
+{% block title %}Layout docs{% endblock %}
+{% block heading %}Layout <em>docs</em>{% endblock %}
+{% block band_text %}How to use the reusable layouts in existing and new pages and apps: every layout, block, component, setting and rule.{% endblock %}
+{% block toc %}
+<li><a href="#start">Start here</a></li>
+<li><a href="#how">How a page is drawn</a></li>
+<li><a href="#choose">Pick a layout</a></li>
+<li><a href="#new-page">A new page</a></li>
+<li><a href="#new-app">A new app</a></li>
+<li><a href="#access">Public, private, staff</a></li>
+<li><a href="#blocks">Blocks</a></li>
+<li><a href="#page-layouts">Page layouts</a></li>
+<li><a href="#shells">User, admin, auth, plain</a></li>
+<li><a href="#components">Common pieces</a></li>
+<li><a href="#forms">Forms and fields</a></li>
+<li><a href="#messages">Toasts</a></li>
+<li><a href="#loading">Loading</a></li>
+<li><a href="#modals">Modals, confirm, tabs</a></li>
+<li><a href="#account">Account modal</a></li>
+<li><a href="#menus">Menus and sidebars</a></li>
+<li><a href="#sections">Sections</a></li>
+<li><a href="#settings">Settings</a></li>
+<li><a href="#look">Look and themes</a></li>
+<li><a href="#screens">Every screen</a></li>
+<li><a href="#security">Security checklist</a></li>
+<li><a href="#icons">Icons</a></li>
+<li><a href="#files">Where things are</a></li>
+<li><a href="#faq">Problems and answers</a></li>
+{% endblock %}
+{% block legal_text %}
+<h2 id="start">Start here</h2>
+<p>The <code>layout</code> app holds everything that is shared: every layout, partial and component, the styles, the scripts and the
+pictures. Other apps never copy any of it. Their pages pick a layout and fill in a few blocks with their own words.</p>
+<ul>
+  <li><strong>Change a layout once and every page using it changes.</strong> A page only changes itself.</li>
+  <li><strong>Each page shows only what it needs.</strong> It picks one layout, and the layout only carries the parts it uses.</li>
+  <li><strong>A page writes its own content in plain HTML.</strong> Only the frame (header, menus, footer) comes from the
+    layout. The fields of a form, the cards and the sections are written in the page itself, so you can read the page
+    top to bottom and see exactly what it shows. The shared CSS classes give it the look.</li>
+  <li><strong>The layout decides how a page looks, never who may see it.</strong> Access is checked in the view
+    (<a href="#access">Public, private, staff</a>).</li>
+</ul>
+<p class="docs-note">See every part working on the <a href="{% url 'layout:gallery' %}">layout gallery</a>. This page and the gallery
+are open while <code>DJANGO_DEBUG=True</code>; otherwise only staff can open them.</p>
+
+<h2 id="how">How a page is drawn</h2>
+<ol>
+  <li>A <strong>view</strong> checks who may open the page, then renders a template.</li>
+  <li>The <strong>template</strong> starts with <code>{% verbatim %}{% extends "layout/…" %}{% endverbatim %}</code> and fills a few blocks.</li>
+  <li>The <strong>layout</strong> adds its header, menus, sidebar and footer.</li>
+  <li><code>layout/base.html</code>, the one HTML skeleton, adds the &lt;head&gt;, styles, scripts, loader and toasts.</li>
+</ol>
+<pre><code>{% verbatim %}view  →  your template  →  a layout (public, user, admin, pages/banner…)  →  layout/base.html{% endverbatim %}</code></pre>
+<p>Every template also gets one variable, <code>layout</code>, from <code>layout/context_processors.py</code>. It holds the site name,
+the menus this person may see, the sign-in links, the toast and loader settings, and the person's own layout choices.</p>
+
+<h2 id="choose">Pick a layout</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Layout</th><th>Who</th><th>What it looks like</th><th>Use it for</th></tr></thead>
+  <tbody>
+    <tr><td><code>layout/public.html</code></td><td>Everyone</td><td>Header, menu, footer</td><td>Any ordinary public page</td></tr>
+    <tr><td><code>layout/pages/home.html</code></td><td>Everyone</td><td>Full-screen picture, big title, buttons</td><td>Home or landing pages</td></tr>
+    <tr><td><code>layout/pages/banner.html</code></td><td>Everyone</td><td>Picture strip with title and breadcrumbs</td><td>About, contact, services</td></tr>
+    <tr><td><code>layout/pages/band.html</code></td><td>Everyone</td><td>Plain coloured strip with title</td><td>Simple pages, forms</td></tr>
+    <tr><td><code>layout/pages/listing.html</code></td><td>Everyone</td><td>Band, toolbar, grid of cards, page links</td><td>News, products, search results</td></tr>
+    <tr><td><code>layout/pages/detail.html</code></td><td>Everyone</td><td>Big photo header, main column, side box</td><td>One product, place or event</td></tr>
+    <tr><td><code>layout/pages/article.html</code></td><td>Everyone</td><td>Band, one reading column</td><td>Blog posts, help articles</td></tr>
+    <tr><td><code>layout/pages/legal.html</code></td><td>Everyone</td><td>Band, contents list, long text</td><td>Privacy, terms, guides (like this page)</td></tr>
+    <tr><td><code>layout/pages/centered.html</code></td><td>Everyone</td><td>One short message in the middle</td><td>Errors, thank you, coming soon</td></tr>
+    <tr><td><code>layout/auth.html</code></td><td>Everyone</td><td>Picture and quote beside the form, no menus</td><td>Sign-in, sign-up, password pages</td></tr>
+    <tr><td><code>layout/plain.html</code></td><td>Everyone</td><td>Only the page: no header or footer</td><td>Maintenance, print, embedded pages</td></tr>
+    <tr><td><code>layout/user.html</code></td><td><strong>Signed in</strong></td><td>Public header and footer plus an account sidebar</td><td>Dashboard, orders, profile</td></tr>
+    <tr><td><code>layout/admin.html</code></td><td><strong>Staff</strong></td><td>Admin header and dark sidebar</td><td>Staff pages</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="new-page">A new page</h2>
+<p>For example, a FAQ page in the website app (<code>frontend</code>):</p>
+<h3>1. The view</h3>
+<pre><code>{% verbatim %}# frontend/views.py
+from django.shortcuts import render
+from django.urls import reverse
+from layout.access import public
+
+@public
+def faq(request):
+    return render(request, "frontend/faq.html", {
+        "breadcrumbs": [("Home", reverse("frontend:home")), ("FAQ", None)],
+    }){% endverbatim %}</code></pre>
+<h3>2. The address</h3>
+<pre><code>{% verbatim %}# frontend/urls.py
+path("faq/", views.faq, name="faq"),{% endverbatim %}</code></pre>
+<h3>3. The template: pick a layout, fill its blocks</h3>
+<pre><code>{% verbatim %}{# frontend/templates/frontend/faq.html #}
+{% extends "layout/pages/banner.html" %}
+{% block title %}FAQ{% endblock %}
+{% block heading %}Good to &lt;em&gt;know&lt;/em&gt;{% endblock %}
+{% block banner_text %}Answers to common questions.{% endblock %}
+{% block content %}
+  &lt;div class="panel"&gt;&lt;p&gt;…&lt;/p&gt;&lt;/div&gt;
+{% endblock %}{% endverbatim %}</code></pre>
+<h3>4. The menu (optional)</h3>
+<pre><code>{% verbatim %}# config/settings.py → LAYOUT["PUBLIC_NAV"]
+{"label": "FAQ", "url": "frontend:faq", "icon": "info"},{% endverbatim %}</code></pre>
+<p class="docs-note">Write <code>&lt;em&gt;…&lt;/em&gt;</code> in a heading for the italic crimson word. Breadcrumbs are optional: pass
+<code>breadcrumbs</code> from the view and the layout draws them.</p>
+
+<h2 id="new-app">A new app</h2>
+<p>A future app (accounts, shop, blog…) uses the same layouts. Nothing is copied.</p>
+<ol>
+  <li><code>python manage.py startapp shop</code>, then add <code>"shop"</code> to <code>INSTALLED_APPS</code> in <code>config/settings.py</code>.</li>
+  <li>In <code>config/urls.py</code>, above the <code>frontend</code> line: <code>path("shop/", include("shop.urls"))</code>.</li>
+  <li>Choose who may open each page in its view (next section).</li>
+  <li>Put templates in <code>shop/templates/shop/</code>. Each one starts with <code>{% verbatim %}{% extends "layout/…" %}{% endverbatim %}</code>.</li>
+  <li>Add links to <code>LAYOUT</code> in settings: <code>PUBLIC_NAV</code>, <code>USER_NAV</code>, <code>ADMIN_NAV</code> or <code>ACCOUNT["NAV"]</code>.</li>
+</ol>
+<pre><code>{% verbatim %}# shop/views.py
+from django.contrib.auth.decorators import permission_required
+from django.shortcuts import render
+from layout.access import public, private, staff_only
+
+@public
+def products(request):                       # → layout/pages/listing.html
+    return render(request, "shop/products.html", {...})
+
+@private
+def orders(request):                         # → layout/user.html
+    return render(request, "shop/orders.html", {...})
+
+@staff_only
+@permission_required("shop.change_product", raise_exception=True)
+def stock(request):                          # → layout/admin.html
+    return render(request, "shop/stock.html", {...}){% endverbatim %}</code></pre>
+<pre><code>{% verbatim %}{# shop/templates/shop/orders.html #}
+{% extends "layout/user.html" %}
+{% block title %}Your orders{% endblock %}
+{% block heading %}Your orders{% endblock %}
+{% block page_actions %}&lt;a class="button button--small" href="…"&gt;New order&lt;/a&gt;{% endblock %}
+{% block content %}…{% endblock %}{% endverbatim %}</code></pre>
+<p><strong>An accounts app</strong> also tells the layouts where signing in happens, once, in settings:</p>
+<pre><code>{% verbatim %}LOGIN_URL = "accounts:login"
+LAYOUT["ACCOUNT"] = {
+    "LOGIN_URL": "accounts:login", "SIGNUP_URL": "accounts:signup",
+    "LOGOUT_URL": "accounts:logout", "PASSWORD_RESET_URL": "accounts:password_reset",
+    "MODAL": True, "NAV": [{"label": "Your orders", "url": "shop:orders"}],
+}{% endverbatim %}</code></pre>
+<p>From then on, the header's Sign in, Create account and Sign out links and the <a href="#account">account modal</a> all use them.</p>
+
+<h2 id="access">Public, private, staff</h2>
+<p>Access is always decided in the view, with <code>layout/access.py</code>:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Function views</th><th>Class-based views</th><th>Who</th><th>Others get</th></tr></thead>
+  <tbody>
+    <tr><td><code>@public</code></td><td>(nothing)</td><td>Everyone</td><td>-</td></tr>
+    <tr><td><code>@private</code></td><td><code>PrivateMixin</code></td><td>Signed-in people</td><td>The sign-in page</td></tr>
+    <tr><td><code>@staff_only</code></td><td><code>StaffMixin</code></td><td>Active staff</td><td>Sign-in page, or 403 if signed in</td></tr>
+    <tr><td><code>@dev_or_staff</code></td><td>-</td><td>Anyone while DEBUG, otherwise staff</td><td>404</td></tr>
+  </tbody>
+</table></div>
+<ul>
+  <li>Add <code>@permission_required("app.codename", raise_exception=True)</code> under the decorator when a page needs a Django permission.</li>
+  <li><strong>Safety net:</strong> <code>user.html</code> only shows its content to signed-in people, and <code>admin.html</code> only to
+    active staff. Anyone else sees a notice instead, so a forgotten decorator still doesn't leak a private page.</li>
+  <li>Hiding a menu link is never the protection: give the link <code>"perm"</code> to hide it, and still check in the view.</li>
+</ul>
+
+<h2 id="blocks">Blocks</h2>
+<p>Every layout is built from the blocks of <code>layout/base.html</code>. A page fills them, empties them to hide a part, or adds to
+them with <code>{% verbatim %}{{ block.super }}{% endverbatim %}</code>.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Block</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>title</code></td><td>The browser tab title (the site name is added after it)</td></tr>
+    <tr><td><code>description</code>, <code>meta</code></td><td>The page description for search engines; extra meta tags</td></tr>
+    <tr><td><code>styles</code>, <code>scripts</code></td><td>Extra CSS / JS files for one page (<code>&lt;link&gt;</code> / <code>&lt;script src&gt;</code>; never inline code)</td></tr>
+    <tr><td><code>body_class</code></td><td>Extra class on &lt;body&gt; for one page</td></tr>
+    <tr><td><code>nav_mode</code></td><td><code>solid</code> (default), <code>transparent</code> (header over a picture until you scroll) or <code>static</code></td></tr>
+    <tr><td><code>loader</code></td><td>The page loader; empty it to skip the loader on one page</td></tr>
+    <tr><td><code>header</code>, <code>footer</code></td><td>The header and footer</td></tr>
+    <tr><td><code>hero</code></td><td>Full-width area under the header (pictures, bands)</td></tr>
+    <tr><td><code>sidebar</code></td><td>The side menu (user and admin layouts)</td></tr>
+    <tr><td><code>main</code></td><td>Wraps everything in &lt;main&gt;; private layouts use it to hide content</td></tr>
+    <tr><td><code>breadcrumbs</code></td><td>The breadcrumb trail (from the view's <code>breadcrumbs</code>)</td></tr>
+    <tr><td><code>page_header</code>, <code>heading</code>, <code>page_actions</code></td><td>The heading row: its title, and buttons beside it</td></tr>
+    <tr><td><code>content</code></td><td>The page's own content</td></tr>
+    <tr><td><code>toasts</code></td><td>Where toasts appear</td></tr>
+    <tr><td><code>modals</code></td><td>Modal templates this layout needs (the public layout puts the account modal here)</td></tr>
+  </tbody>
+</table></div>
+<pre><code>{% verbatim %}{% block breadcrumbs %}{% endblock %}            {# no breadcrumbs on this page #}
+{% block page_header %}{% endblock %}            {# no heading row #}
+{% block footer %}{% endblock %}                 {# no footer #}
+{% block modals %}{% endblock %}                 {# no account modal #}
+{% block nav_mode %}transparent{% endblock %}    {# header over a picture #}
+{% block scripts %}&lt;script src="{% static 'shop/js/cart.js' %}" defer&gt;&lt;/script&gt;{% endblock %}{% endverbatim %}</code></pre>
+
+<h2 id="page-layouts">Page layouts</h2>
+<p>All of them are built on <code>public.html</code>. Each file lists its blocks in a comment at the top.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Layout</th><th>Blocks to fill</th><th>Optional</th></tr></thead>
+  <tbody>
+    <tr><td><code>pages/home.html</code></td><td><code>title</code>, <code>eyebrow</code>, <code>hero_title</code>, <code>hero_text</code>, <code>hero_actions</code>, <code>content</code></td><td><code>hero_image</code></td></tr>
+    <tr><td><code>pages/banner.html</code></td><td><code>title</code>, <code>heading</code>, <code>banner_text</code>, <code>content</code></td><td><code>banner_image</code>, <code>banner_actions</code></td></tr>
+    <tr><td><code>pages/band.html</code></td><td><code>title</code>, <code>heading</code>, <code>band_text</code>, <code>content</code></td><td>-</td></tr>
+    <tr><td><code>pages/listing.html</code></td><td><code>heading</code>, <code>items</code> (cards); the view passes <code>page_obj</code></td><td><code>band_text</code>, <code>toolbar</code></td></tr>
+    <tr><td><code>pages/detail.html</code></td><td><code>heading</code>, <code>detail_body</code>, <code>detail_aside</code></td><td><code>detail_image</code>, <code>detail_meta</code></td></tr>
+    <tr><td><code>pages/article.html</code></td><td><code>heading</code>, <code>article</code></td><td><code>band_text</code> (e.g. the date)</td></tr>
+    <tr><td><code>pages/legal.html</code></td><td><code>heading</code>, <code>toc</code> (list items), <code>legal_text</code> (h2 with ids)</td><td><code>band_text</code></td></tr>
+    <tr><td><code>pages/centered.html</code></td><td><code>heading</code>, <code>centered_text</code></td><td><code>centered_label</code>, <code>centered_icon</code>, <code>centered_actions</code></td></tr>
+  </tbody>
+</table></div>
+<h3>Listing: cards with page links</h3>
+<pre><code>{% verbatim %}# view
+from django.core.paginator import Paginator
+page_obj = Paginator(Product.objects.all(), 12).get_page(request.GET.get("page"))
+return render(request, "shop/products.html", {"page_obj": page_obj})
+
+{# template #}
+{% extends "layout/pages/listing.html" %}
+{% block heading %}Products{% endblock %}
+{% block toolbar %}&lt;span&gt;{{ page_obj.paginator.count }} products&lt;/span&gt;{% endblock %}
+{% block items %}
+  {% for p in page_obj %}
+    &lt;article class="card"&gt;
+      &lt;div class="card__body"&gt;
+        &lt;h3 class="card__title"&gt;{{ p.name }}&lt;/h3&gt;
+        &lt;p&gt;{{ p.summary }}&lt;/p&gt;
+        &lt;a class="card__link" href="{{ p.get_absolute_url }}"&gt;View &amp;rarr;&lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  {% empty %}
+    &lt;div class="empty-state"&gt;&lt;p class="empty-state__title"&gt;No products yet&lt;/p&gt;&lt;/div&gt;
+  {% endfor %}
+{% endblock %}{% endverbatim %}</code></pre>
+<h3>Picture of your own</h3>
+<pre><code>{% verbatim %}{% load static %}
+{% block banner_image %}{% static 'shop/img/banner.jpg' %}{% endblock %}{% endverbatim %}</code></pre>
+<h3>Error pages</h3>
+<p><code>403.html</code>, <code>404.html</code> and <code>500.html</code> are in <code>layout/templates/</code> and use the centered layout.
+Django uses them automatically when <code>DJANGO_DEBUG=False</code>.</p>
+
+<h2 id="shells">User, admin, auth, plain</h2>
+<ul>
+  <li><strong><code>layout/user.html</code></strong> (private): the public header and footer, plus a sidebar with the person's name and
+    <code>LAYOUT["USER_NAV"]</code>. Use with <code>@private</code>.</li>
+  <li><strong><code>layout/admin.html</code></strong> (staff): the admin header, a dark sidebar with <code>LAYOUT["ADMIN_NAV"]</code> and a small
+    footer. Use with <code>@staff_only</code>. The start page of the staff area is <code>LAYOUT["ADMIN_HOME_URL"]</code>.</li>
+  <li><strong><code>layout/auth.html</code></strong>: a picture with a quote beside the form, and no menus. Change them with the
+    <code>auth_image</code>, <code>auth_quote</code> and <code>auth_quote_by</code> blocks.</li>
+  <li><strong><code>layout/plain.html</code></strong>: only the page. It has no loader, breadcrumbs, header or footer.</li>
+</ul>
+<pre><code>{% verbatim %}{% extends "layout/auth.html" %}
+{% block title %}Sign in{% endblock %}
+{% block heading %}Sign in{% endblock %}
+{% block content %}
+  &lt;form class="form" method="post" novalidate&gt;{% csrf_token %}
+    …the username and password fields, written out (see Forms and fields)…
+    &lt;button type="submit" class="button button--block"&gt;Sign in&lt;/button&gt;
+  &lt;/form&gt;
+{% endblock %}{% endverbatim %}</code></pre>
+
+<h2 id="components">Common pieces</h2>
+<p>There are no component files to include: a page writes these pieces in plain HTML, and the shared classes give them the
+look. Copy the one you need. The website's pages (<code>frontend/templates/frontend/</code>) are full examples.</p>
+<h3>Card</h3>
+<pre><code>{% verbatim %}&lt;div class="cards"&gt;
+  &lt;article class="card"&gt;
+    &lt;img class="card__image" src="{% static 'layout/img/scene-2.svg' %}" alt="" loading="lazy" width="640" height="400"&gt;
+    &lt;div class="card__body"&gt;
+      &lt;p class="card__meta"&gt;4 Nov 2026&lt;/p&gt;
+      &lt;h3 class="card__title"&gt;News&lt;/h3&gt;
+      &lt;p&gt;A short summary.&lt;/p&gt;
+      &lt;a class="card__link" href="…"&gt;Read &amp;rarr;&lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/article&gt;
+&lt;/div&gt;{% endverbatim %}</code></pre>
+<h3>Section heading</h3>
+<pre><code>{% verbatim %}&lt;section class="section"&gt;                       {# add section--pale or section--dark for a background #}
+  &lt;header class="section-head section-head--center"&gt;
+    &lt;p class="label"&gt;Latest&lt;/p&gt;
+    &lt;h2 class="title"&gt;Recent &lt;em&gt;news&lt;/em&gt;&lt;/h2&gt;
+    &lt;p class="section-head__text"&gt;One short line.&lt;/p&gt;
+  &lt;/header&gt;
+  …
+&lt;/section&gt;{% endverbatim %}</code></pre>
+<h3>Message box, empty list, loading animation, icon</h3>
+<pre><code>{% verbatim %}&lt;div class="alert alert--warning" role="status"&gt;&lt;p&gt;Your trial ends soon.&lt;/p&gt;&lt;/div&gt;   {# success, info, warning, error #}
+
+&lt;div class="empty-state"&gt;
+  {% include "layout/partials/icon.html" with name="info" %}
+  &lt;p class="empty-state__title"&gt;Nothing yet&lt;/p&gt;
+  &lt;p&gt;Add your first item.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;span class="spinner spinner--dots spinner--md" aria-hidden="true"&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="spinner spinner--spinner spinner--sm" aria-hidden="true"&gt;&lt;/span&gt;
+
+{% include "layout/partials/icon.html" with name="star" %}       {# every icon is listed under Icons #}{% endverbatim %}</code></pre>
+<p>More ready-made blocks for sections are in the website's pages: <code>features</code>/<code>feature</code>, <code>numbers</code>/<code>number</code>,
+<code>steps</code>, <code>faq</code> (with <code>&lt;details&gt;</code>), <code>quotes</code>/<code>quote</code>, <code>plans</code>/<code>plan</code>,
+<code>gallery</code> and <code>text-image</code>.</p>
+<h3>Ready-made classes</h3>
+<p>Buttons: <code>button</code>, plus <code>button--outline</code>, <code>button--ghost</code> (on pictures), <code>button--danger</code>,
+<code>button--small</code> or <code>button--block</code>. Boxes: <code>panel</code>, <code>stats</code> with
+<code>stat</code>, <code>table</code> (inside <code>table-wrap</code> so it scrolls on phones). Text: <code>prose</code>,
+<code>ticks</code> (a ticked list), <code>label</code> and <code>title</code>. Columns: <code>cards</code>, and
+<code>with-aside</code> (main column plus side box).</p>
+
+<h2 id="forms">Forms and fields</h2>
+<p>Write each field in the page. A full example is <code>frontend/templates/frontend/contact.html</code>. One field looks like this:</p>
+<pre><code>{% verbatim %}&lt;div class="field{% if form.email.errors %} is-invalid{% endif %}" data-field data-type="email"&gt;
+  &lt;label class="field__label" for="id_email"&gt;Email &lt;span class="field__req"&gt;*&lt;/span&gt;&lt;/label&gt;
+  &lt;div class="field__control"&gt;
+    &lt;span class="field__icon"&gt;{% include "layout/partials/icon.html" with name="mail" %}&lt;/span&gt;
+    &lt;input type="email" id="id_email" name="email" required value="{{ form.email.value|default_if_none:'' }}"&gt;
+    &lt;span class="field__end"&gt;
+      &lt;button type="button" class="field__btn" data-field-clear aria-label="Clear email" hidden&gt;{% include "layout/partials/icon.html" with name="x" %}&lt;/button&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;
+  &lt;p class="field__error"&gt;{{ form.email.errors.0 }}&lt;/p&gt;
+&lt;/div&gt;{% endverbatim %}</code></pre>
+<div class="table-wrap"><table>
+  <thead><tr><th>Part</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>class="field"</code>, <code>data-field</code></td><td>The look, and turns on the ✕ button and the live checks (<code>layout/js/fields.js</code>)</td></tr>
+    <tr><td><code>data-type</code></td><td><code>text</code>, <code>email</code>, <code>url</code>, <code>password</code>, <code>phone</code>, <code>textarea</code>, <code>checkbox</code>, <code>number</code>: which check runs</td></tr>
+    <tr><td><code>required</code>, <code>minlength</code>, <code>maxlength</code></td><td>Normal HTML rules on the input, checked while typing</td></tr>
+    <tr><td><code>field__icon</code></td><td>The icon at the start (any icon name); leave it out for none</td></tr>
+    <tr><td><code>data-field-clear … hidden</code></td><td>The ✕ button; it shows itself once there is text</td></tr>
+    <tr><td><code>data-field-eye</code></td><td>The show/hide button for passwords (put it after the ✕)</td></tr>
+    <tr><td><code>field__end-icon</code></td><td>An icon at the end</td></tr>
+    <tr><td><code>data-match="id_password1"</code></td><td>Must be the same as that field (repeat password)</td></tr>
+    <tr><td><code>field__help</code>, <code>field__error</code></td><td>A hint; the error (the server's message, or the live one)</td></tr>
+    <tr><td><code>is-invalid</code></td><td>Red border when the server found a problem</td></tr>
+  </tbody>
+</table></div>
+<p>Put <code>{% verbatim %}{% if form.errors %}{% endverbatim %}&lt;div class="form-errors" role="alert"&gt;…&lt;/div&gt;{% verbatim %}{% endif %}{% endverbatim %}</code>
+at the top of the form for a summary. A password field gets both end buttons:</p>
+<pre><code>{% verbatim %}&lt;span class="field__end"&gt;
+  &lt;button type="button" class="field__btn" data-field-clear aria-label="Clear password" hidden&gt;{% include "layout/partials/icon.html" with name="x" %}&lt;/button&gt;
+  &lt;button type="button" class="field__btn" data-field-eye aria-label="Show password" aria-pressed="false"&gt;{% include "layout/partials/icon.html" with name="eye" %}&lt;/button&gt;
+&lt;/span&gt;{% endverbatim %}</code></pre>
+<ul>
+  <li><strong>Errors:</strong> each field is checked while typing, with the server's own messages. A form with problems isn't sent;
+    the first problem gets focus and a toast explains. The server still checks everything. Errors for the whole form show at
+    the top, and each field's errors under it.</li>
+  <li><strong>The Django form still checks everything on the server.</strong> Keep a form class in <code>forms.py</code> and
+    give each input the same <code>name</code> as the form field.</li>
+  <li>Checkbox: <code>&lt;div class="field field--check" data-field data-type="checkbox"&gt;&lt;label class="check"&gt;&lt;input type="checkbox" name="agree" required&gt;&lt;span&gt;I agree&lt;/span&gt;&lt;/label&gt;…</code></li>
+  <li>Radio buttons: a <code>&lt;fieldset class="field field--choices"&gt;</code> with a <code>&lt;div class="radio-row"&gt;</code> of labels
+    (see <code>layout/templates/layout/screens/preferences.html</code>).</li>
+</ul>
+<h3 id="phone">Phone numbers</h3>
+<p>The page writes the country list and the number box; <code>PhoneField</code> checks them on the server:</p>
+<pre><code>{% verbatim %}# forms.py
+from layout.forms import PhoneField
+phone = PhoneField(required=False)            # saved as "+9779812345678"
+
+# view: give the page the country list and the country picked
+from layout import countries
+"countries": countries.COUNTRIES,
+"phone_country": request.POST.get("phone_0") or countries.default_code(),{% endverbatim %}</code></pre>
+<pre><code>{% verbatim %}&lt;div class="field" data-field data-type="phone"&gt;
+  &lt;label class="field__label" for="id_phone_1"&gt;Phone&lt;/label&gt;
+  &lt;div class="field__control"&gt;
+    &lt;div class="phone" data-phone&gt;
+      &lt;select id="id_phone_0" name="phone_0" class="phone__country" aria-label="Country calling code" data-phone-country&gt;
+        {% for code, name, dial, min_digits, max_digits in countries %}
+          &lt;option value="{{ code }}" data-name="{{ name }}" data-dial="{{ dial }}" data-min="{{ min_digits }}" data-max="{{ max_digits }}"{% if code == phone_country %} selected{% endif %}&gt;{{ name }} (+{{ dial }})&lt;/option&gt;
+        {% endfor %}
+      &lt;/select&gt;
+      &lt;input type="tel" id="id_phone_1" name="phone_1" inputmode="tel" value="{{ form.data.phone_1|default:'' }}"&gt;
+    &lt;/div&gt;
+    &lt;span class="field__end"&gt;…the ✕ button…&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;p class="field__error"&gt;{{ form.phone.errors.0 }}&lt;/p&gt;
+&lt;/div&gt;{% endverbatim %}</code></pre>
+<p><code>fields.js</code> turns the list into a searchable picker and checks the number of digits for the chosen country. The first
+country is <code>LAYOUT["PHONE_DEFAULT_COUNTRY"]</code>, and the list is in <code>layout/countries.py</code>.</p>
+
+<h2 id="messages">Toasts</h2>
+<p>Every Django message appears as a toast. Nothing else is needed:</p>
+<pre><code>{% verbatim %}from django.contrib import messages
+messages.success(request, "Saved.")          # also .info, .warning, .error
+return redirect("shop:orders"){% endverbatim %}</code></pre>
+<p>From a page: <code>&lt;button data-toast='{"message": "Copied", "type": "success"}'&gt;</code>. In JavaScript:
+<code>Layout.toast("Copied", {type: "success", title: "Done", duration: 5000, position: "bottom-right"})</code>.
+<code>LAYOUT["TOASTS"]</code> sets the position and time. Toasts always appear above an open modal.</p>
+
+<h2 id="loading">Loading</h2>
+<ul>
+  <li><strong>Page loader:</strong> covers the page until it is ready. Settings: <code>LAYOUT["LOADER"]</code> (<code>PAGE</code>,
+    <code>STYLE</code> spinner/dots/pulse, <code>TEXT</code>). Empty <code>{% verbatim %}{% block loader %}{% endverbatim %}</code> to skip it on one page.</li>
+  <li><strong>Between pages:</strong> a thin line at the top (<code>NAVIGATE</code>: bar, loader or none).</li>
+  <li><strong>A form, link or button:</strong> <code>data-loading='{"text": "Sending", "place": "center"}'</code>, where <code>place</code>
+    is center, fullscreen, top-left, top-right, bottom-left or bottom-right.</li>
+  <li>The button that sent a form shows a spinner and can't be pressed twice.</li>
+  <li>JavaScript: <code>var l = Layout.loading({text: "Saving"}); l.hide()</code> and <code>Layout.progress.start()</code> / <code>.done()</code>.</li>
+</ul>
+
+<h2 id="modals">Modals, confirm, tabs</h2>
+<pre><code>{% verbatim %}&lt;a href="/terms/" data-modal='{"template": "#terms", "title": "Terms", "size": "lg"}'&gt;Terms&lt;/a&gt;
+&lt;template id="terms"&gt;
+  &lt;p&gt;…&lt;/p&gt;
+  &lt;button type="button" class="button" data-modal-close&gt;OK&lt;/button&gt;
+&lt;/template&gt;{% endverbatim %}</code></pre>
+<ul>
+  <li><code>size</code>: sm, md, lg or full. <code>place: "right"</code> makes a side panel. <code>tab</code> opens on a tab inside the template.</li>
+  <li>Without JavaScript the link simply opens its page. A modal's content always comes from a <code>&lt;template&gt;</code> in the page.</li>
+  <li><strong>Ask first:</strong> <code>data-confirm='{"title": "Delete?", "message": "…", "confirm": "Delete", "danger": true}'</code> on a link, button or form.</li>
+  <li>JavaScript: <code>Layout.modal({...})</code>, <code>await Layout.confirm({...})</code> and <code>await Layout.alert({...})</code>.</li>
+</ul>
+<pre><code>{% verbatim %}&lt;div data-tabs&gt;
+  &lt;div role="tablist" aria-label="Details"&gt;
+    &lt;button type="button" role="tab" aria-controls="t1" aria-selected="true"&gt;Overview&lt;/button&gt;
+    &lt;button type="button" role="tab" aria-controls="t2" aria-selected="false" tabindex="-1"&gt;Reviews&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div role="tabpanel" id="t1"&gt;…&lt;/div&gt;
+  &lt;div role="tabpanel" id="t2" hidden&gt;…&lt;/div&gt;
+&lt;/div&gt;{% endverbatim %}</code></pre>
+
+<h2 id="account">Account modal</h2>
+<ul>
+  <li>"Sign in" in the header opens a modal (<code>layout/partials/auth_modal.html</code>). Only the public layout carries it, and only
+    for people who aren't signed in.</li>
+  <li>The layout only draws it. The forms post to <code>LAYOUT["ACCOUNT"]</code> addresses, and the app behind them checks everything.</li>
+  <li><strong>Sign in</strong> posts to <code>LOGIN_URL</code>. For now that's Django's admin sign-in, so only staff can sign in until an
+    accounts app exists.</li>
+  <li><strong>Register</strong>: the tab and the "Create account" button appear only once <code>SIGNUP_URL</code> exists.</li>
+  <li><code>PASSWORD_RESET_URL</code> adds "Forgot your password?". <code>"MODAL": False</code> turns the modal off, so the links open the pages.</li>
+  <li>To use it on another layout, put it in that layout's <code>modals</code> block. To drop it on one page, empty
+    <code>{% verbatim %}{% block modals %}{% endblock %}{% endverbatim %}</code>.</li>
+</ul>
+
+<h2 id="menus">Menus and sidebars</h2>
+<p>All menus live in <code>LAYOUT</code> in <code>config/settings.py</code>. Each one is a list:</p>
+<pre><code>{% verbatim %}"ADMIN_NAV": [
+    {"label": "Dashboard", "url": "layout:staff_home", "icon": "home"},
+    {"heading": "Manage"},                                               # a small heading
+    {"label": "Orders", "url": "shop:orders", "icon": "file",
+     "perm": "shop.view_order", "badge": "shop.badges.new_orders"},      # needs a permission; shows a number
+    {"label": "Shop", "icon": "globe", "children": [                     # a group that opens
+        {"label": "Products", "url": "shop:products", "icon": "file"},
+    ]},
+    {"label": "Reports", "url": "shop:reports", "staff": True, "groups": ["Managers"]},
+],{% endverbatim %}</code></pre>
+<ul>
+  <li><code>url</code> is a URL name (or a path that starts with /). A link to a page that doesn't exist yet is simply left out.</li>
+  <li><code>perm</code>, <code>groups</code> and <code>staff</code> hide the link from people who can't use it. Empty groups and lonely headings disappear.</li>
+  <li><code>badge</code> names a function that takes the request and returns a number (0 hides it); see <code>layout/badges.py</code>.</li>
+  <li>The current page's link is marked automatically.</li>
+  <li>Sidebars fold to icons with their ⇤ button (remembered in the browser; the default comes from Layout preferences). On phones
+    they become a panel that slides in.</li>
+</ul>
+
+<h2 id="sections">Sections</h2>
+<p>Sections are written in the page itself, like everything else on it. Each one is a <code>&lt;section class="section"&gt;</code>
+with a heading and its own block. Add <code>section--pale</code> or <code>section--dark</code> for a background. Copy the one you
+need from the website's pages:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Section</th><th>Classes</th><th>Example in</th></tr></thead>
+  <tbody>
+    <tr><td>Cards</td><td><code>cards</code> › <code>card</code></td><td><code>frontend/home.html</code>, <code>stories.html</code></td></tr>
+    <tr><td>Features (icon, title, text)</td><td><code>features</code> › <code>feature</code>, <code>feature__icon</code></td><td><code>home.html</code></td></tr>
+    <tr><td>Numbers</td><td><code>numbers</code> › <code>number</code></td><td><code>home.html</code></td></tr>
+    <tr><td>Quotes</td><td><code>quotes</code> › <code>quote</code></td><td><code>home.html</code></td></tr>
+    <tr><td>Call to action</td><td><code>section section--dark</code>, <code>section__more</code></td><td><code>home.html</code></td></tr>
+    <tr><td>Steps</td><td><code>steps</code> (an <code>&lt;ol&gt;</code>)</td><td><code>services.html</code></td></tr>
+    <tr><td>Prices</td><td><code>plans</code> › <code>plan</code>, <code>plan--featured</code>, <code>plan__price</code></td><td><code>services.html</code></td></tr>
+    <tr><td>Text with a picture</td><td><code>text-image</code>, <code>text-image__media</code> (<code>text-image--left</code>)</td><td><code>services.html</code></td></tr>
+    <tr><td>Pictures</td><td><code>gallery</code> › <code>&lt;figure&gt;</code></td><td><code>services.html</code></td></tr>
+    <tr><td>Questions</td><td><code>faq</code> › <code>&lt;details&gt;</code></td><td><code>services.html</code></td></tr>
+  </tbody>
+</table></div>
+<pre><code>{% verbatim %}&lt;section class="section section--pale"&gt;
+  &lt;header class="section-head section-head--center"&gt;
+    &lt;p class="label"&gt;Why us&lt;/p&gt;
+    &lt;h2 class="title"&gt;Every detail, &lt;em&gt;cared for&lt;/em&gt;&lt;/h2&gt;
+  &lt;/header&gt;
+  &lt;div class="features"&gt;
+    &lt;div class="feature"&gt;
+      &lt;span class="feature__icon"&gt;{% include "layout/partials/icon.html" with name="shield" %}&lt;/span&gt;
+      &lt;h3&gt;Safe&lt;/h3&gt;
+      &lt;p&gt;Your data stays yours.&lt;/p&gt;
+    &lt;/div&gt;
+    …
+  &lt;/div&gt;
+&lt;/section&gt;{% endverbatim %}</code></pre>
+
+<h2 id="settings">Settings</h2>
+<p>Everything the layouts read is in <code>LAYOUT</code> in <code>config/settings.py</code>. Values with fixed choices are checked, so a
+typo falls back to the default.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Key</th><th>What</th></tr></thead>
+  <tbody>
+    <tr><td><code>SITE_NAME</code>, <code>DESCRIPTION</code></td><td>Shown in the header, footer, titles and search results</td></tr>
+    <tr><td><code>HOME_URL</code>, <code>ADMIN_HOME_URL</code></td><td>Where the logo goes; the staff area's start page</td></tr>
+    <tr><td><code>ACCOUNT</code></td><td><code>LOGIN_URL</code>, <code>SIGNUP_URL</code>, <code>LOGOUT_URL</code>, <code>PASSWORD_RESET_URL</code>, <code>MODAL</code>, <code>NAV</code></td></tr>
+    <tr><td><code>PUBLIC_NAV</code>, <code>FOOTER_NAV</code></td><td>The header menu; the footer's second column</td></tr>
+    <tr><td><code>USER_NAV</code>, <code>ADMIN_NAV</code></td><td>The sidebars of the user and admin layouts</td></tr>
+    <tr><td><code>TOASTS</code></td><td><code>POSITION</code> (top-left … bottom-right), <code>DURATION</code> (ms, 0 = stays)</td></tr>
+    <tr><td><code>LOADER</code></td><td><code>PAGE</code>, <code>STYLE</code>, <code>TEXT</code>, <code>NAVIGATE</code></td></tr>
+    <tr><td><code>PHONE_DEFAULT_COUNTRY</code></td><td>ISO code of the first country in phone fields</td></tr>
+    <tr><td><code>GROUP_DEFAULTS</code></td><td>Layout choices for members of a group, e.g. <code>{"Editors": {"sidebar": "collapsed"}}</code></td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="look">Look and themes</h2>
+<ul>
+  <li><strong>Colours, fonts and sizes</strong> are variables at the top of <code>layout/static/layout/css/layout.css</code>
+    (<code>--primary</code>, <code>--secondary</code>, <code>--font-display</code>, <code>--radius</code>…). Change one and every page follows.</li>
+  <li><strong>For each person:</strong> <a href="{% url 'layout:preferences' %}">Layout preferences</a> (theme light/dark, sidebar,
+    spacing). Only fixed choices are accepted. For a whole group, use <code>GROUP_DEFAULTS</code>.</li>
+  <li><strong>A new preference:</strong> add a field with <code>choices</code> in <code>layout/models.py</code> (plus <code>DEFAULTS</code>),
+    add it to the form, run <code>makemigrations</code> and <code>migrate</code>, then use it in <code>base.html</code> as a
+    <code>data-…</code> attribute with matching CSS.</li>
+  <li><strong>Change a layout for everyone:</strong> edit its file in <code>layout/templates/layout/</code>, never a copy in another app.</li>
+</ul>
+
+<h2 id="screens">Every screen</h2>
+<p>Every layout adjusts by itself. Nothing is needed in your pages, except wrapping wide tables in <code>table-wrap</code>.</p>
+<ul>
+  <li><strong>Phones:</strong> the menu folds into a button, sidebars slide in, columns stack, and the page never scrolls sideways.
+    Notched screens keep content clear of the notch.</li>
+  <li><strong>Touch:</strong> bigger buttons and links. Hover effects only run on devices that can hover, and form text is at least
+    16px so phones don't zoom in.</li>
+  <li><strong>Tablets</strong> get a tighter menu. <strong>Short screens</strong> (phones turned sideways) get smaller pictures.</li>
+  <li><strong>Large screens and TVs:</strong> from 1920px wide the text steps up, so pages read well from a distance, and focus
+    outlines get thicker for remote controls.</li>
+  <li>Reduced motion, high contrast and printing are handled too.</li>
+</ul>
+
+<h2 id="security">Security checklist</h2>
+<ol>
+  <li>Every view uses <code>@public</code>, <code>@private</code> or <code>@staff_only</code>, plus <code>@permission_required</code> when it needs a permission.</li>
+  <li>Never write inline scripts, inline styles or <code>on…</code> attributes: the security policy blocks them. Use files in
+    <code>static/</code> and the <code>data-…</code> attributes above.</li>
+  <li>Every POST form has <code>{% verbatim %}{% csrf_token %}{% endverbatim %}</code>.</li>
+  <li>Never use <code>|safe</code> or <code>mark_safe</code> on anything a visitor could have typed. Never build a class name,
+    attribute or template path from user input: use fixed choices.</li>
+  <li>Secrets stay in <code>.env</code>. Before going live: <code>DJANGO_DEBUG=False</code>, <code>python manage.py check --deploy</code>
+    and <code>python manage.py collectstatic</code>.</li>
+</ol>
+
+<h2 id="icons">Icons</h2>
+<p><code>{% verbatim %}{% include "layout/partials/icon.html" with name="star" %}{% endverbatim %}</code>. Every icon in <code>layout/img/icons.svg</code>:</p>
+<ul class="icon-list">{% for name in icons %}<li>{% include "layout/partials/icon.html" with name=name %}<code>{{ name }}</code></li>{% endfor %}</ul>
+<p>To add an icon, add a <code>&lt;symbol id="name" viewBox="0 0 24 24"&gt;</code> with stroke paths to <code>icons.svg</code>.
+It appears in this list by itself.</p>
+
+<h2 id="files">Where things are</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Path</th><th>What</th></tr></thead>
+  <tbody>
+    <tr><td><code>layout/templates/layout/base.html</code></td><td>The one HTML skeleton</td></tr>
+    <tr><td><code>layout/templates/layout/*.html</code></td><td>public, user, auth, admin and plain layouts</td></tr>
+    <tr><td><code>layout/templates/layout/pages/</code></td><td>Page layouts</td></tr>
+    <tr><td><code>layout/templates/layout/partials/</code></td><td>Pieces shared by several layouts: icon, logo, menu links, profile menu, sidebar, breadcrumbs, private notice, account modal. (A piece used by one layout is written in that layout: the public header and footer are in <code>public.html</code>, the staff header in <code>admin.html</code>, the loader and toasts in <code>base.html</code>, the page links in <code>pages/listing.html</code>.)</td></tr>
+    <tr><td><code>layout/templates/layout/screens/</code></td><td>The layout app's own pages (preferences, staff start, gallery, these docs)</td></tr>
+    <tr><td><code>layout/static/layout/</code></td><td><code>css/layout.css</code>; <code>js/layout.js</code>, <code>feedback.js</code>, <code>fields.js</code>; <code>img/</code></td></tr>
+    <tr><td><code>layout/access.py</code></td><td>public, private, staff_only, dev_or_staff</td></tr>
+    <tr><td><code>layout/context_processors.py</code></td><td>The <code>layout</code> variable</td></tr>
+    <tr><td><code>layout/forms.py</code>, <code>countries.py</code></td><td>PhoneField, the account modal's forms, preferences</td></tr>
+    <tr><td><code>layout/badges.py</code></td><td>Menu badges</td></tr>
+    <tr><td><code>layout/templates/403.html</code> … <code>500.html</code></td><td>Error pages</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="faq">Problems and answers</h2>
+<h3>My page has no header or styles</h3>
+<p>The template must start with <code>{% verbatim %}{% extends "layout/…" %}{% endverbatim %}</code>, and the view must use
+<code>render(request, …)</code> so the <code>layout</code> variable is there.</p>
+<h3>A menu link doesn't show</h3>
+<p>Its URL name doesn't exist (check <code>app_name</code> and <code>name=</code>), or the person lacks its <code>perm</code>,
+<code>groups</code> or <code>staff</code>.</p>
+<h3>A private page shows "Please sign in" even though it should work</h3>
+<p>The page uses <code>user.html</code> or <code>admin.html</code> and the visitor isn't allowed. That's the safety net working; check
+the view's decorator and the account.</p>
+<h3>My button or script does nothing</h3>
+<p>Inline scripts and <code>on…</code> attributes are blocked. Put the code in a static file and add it with the <code>scripts</code> block.</p>
+<h3>The new page gives "Page not found"</h3>
+<p>Check its line in the app's <code>urls.py</code>, and that the app is included in <code>config/urls.py</code> (new apps above the
+frontend line).</p>
+<h3>I changed CSS or JS but see no difference</h3>
+<p>Reload without the cache (Ctrl+F5). In production, run <code>collectstatic</code> again; file names then change with each version.</p>
+{% endblock %}
